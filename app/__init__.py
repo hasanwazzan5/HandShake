@@ -1,5 +1,5 @@
 # Initialise Flask here
-from flask import Flask, render_template
+from flask import Flask, render_template, url_for
 
 app = Flask(__name__)
 
@@ -15,5 +15,9 @@ def show_habit():
 @app.route('/pairingpage')
 def show_pairing():
     return render_template("site/pairingPage.html")
+
+@app.route('/navigationTest')
+def show_navbar():
+    return render_template('site/navBar.html')
 
 app.run(host="0.0.0.0",port="80",debug=True)
