@@ -1,19 +1,35 @@
+.body {
+    display: flex;
+    align-items: center;
+}
+
 .pageContainer {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
-    min-height: 100vh;
+    min-height: 60vh;
 }
 
 #title {
     text-align: center;
-    padding-top: 10px;
+    padding-top: 20px;
+    padding-bottom: 80px;
 }
 
 .partnerShowcase {
     display: flex;
     flex-direction: row;
     column-gap: 50px;
+    padding-bottom: 100px;
+}
+
+.nav-link {
+    font-weight: 400;
+    color: purple;
+}
+
+.nav-link:hover {
+    color: black;
 }
