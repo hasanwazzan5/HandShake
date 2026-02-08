@@ -18,7 +18,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/styles.css') }}"
     />
-    <title>Document</title>
+    <title>{% block title %}{% endblock %}</title>
   </head>
 
   <body>
@@ -32,7 +32,7 @@
             height="60"
             class="d-inline-block align-text-top me-3"
           />
-          HandShake
+          <span style="font-weight: 600">HandShake</span>
         </a>
         <button
           class="navbar-toggler"
@@ -50,10 +50,11 @@
             <a class="nav-link active" aria-current="page" href="#">Home</a>
             <a class="nav-link" href="#">Friends</a>
             <a class="nav-link" href="#">HandShakes</a>
-            <a class="nav-link disabled" aria-disabled="true">Profile</a>
+            <a class="nav-link" href="#">Profile</a>
           </div>
         </div>
       </div>
     </nav>
+    {% block content %}{% endblock %}
   </body>
 </html>
