@@ -25,11 +25,20 @@
     padding-bottom: 100px;
 }
 
-.nav-link {
-    font-weight: 400;
-    color: purple;
+.theme-card {
+    background-color: #1f1b2e;
 }
 
-.nav-link:hover {
-    color: black;
+.theme-btn {
+    background-color: #7c6cff;
+    border: none;
+}
+
+.text-light {
+    color: #e9e7f5;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #7c6cff;
 }
