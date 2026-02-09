@@ -21,18 +21,21 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
 
-  <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <body class="bg-dark text-light">
+    <nav
+      class="navbar navbar-expand-lg border-bottom border-dark"
+      style="background-color: #141414"
+    >
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center pl-2" href="#">
           <img
             src="{{ url_for('static', filename='assets/HandShake.svg') }}"
             alt="HandShake"
-            width="60"
-            height="60"
+            width="40"
+            height="40"
             class="d-inline-block align-text-top me-3"
           />
-          <span style="font-weight: 600">HandShake</span>
+          <span style="font-weight: 600; color: #7c6cff">HandShake</span>
         </a>
         <button
           class="navbar-toggler"
@@ -46,8 +49,8 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <div class="navbar-nav gap-3">
+            <a class="nav-link" aria-current="page" href="#">Home</a>
             <a class="nav-link" href="#">Friends</a>
             <a class="nav-link" href="#">HandShakes</a>
             <a class="nav-link" href="#">Profile</a>
