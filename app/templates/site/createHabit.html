@@ -1,23 +1,85 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-      crossorigin="anonymous"
-    />
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-      crossorigin="anonymous"
-    ></script>
-    <!-- CSS and JS for the Bootstrap components-->
-    <title>Create habit</title>
-  </head>
-  <body>
-    <h3>Amazing</h3>
-  </body>
-</html>
+{% extends "site/navBar.html" %} 
+{% block title %}Create Habit{% endblock %} 
+{% block content %}
+
+<div class="text-center mb-4">
+  <h2 id="title">Create a New Habit</h2>
+  <p class="text-muted">
+    Create a new habit to track with your partner
+  </p>
+</div>
+
+<div class="pageContainer">
+  <div class="card theme-card shadow" style="width: 18rem">
+    <div class="card-body p-4">
+      <form>
+        <!-- Define Habit -->
+        <div class="mb-4">
+          <label for="habitName" class="form-label" style="font-weight: 600">
+            Habit Name
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            id="habitName"
+            placeholder="e.g. Gym, Cooking, etc..."
+            required
+          />
+        </div>
+        <br>
+
+        <!-- Frequency -->
+        <div class="mb-4">
+          <label class="form-label" style="font-weight: 600">
+            Frequency
+          </label>
+          <div class="d-flex gap-2 flex-wrap">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="frequency"
+                id="daily"
+                value="daily"
+                checked
+              />
+              <label class="form-check-label" for="daily"> Daily </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="frequency"
+                id="weekly"
+                value="weekly"
+              />
+              <label class="form-check-label" for="weekly"> Weekly </label>
+            </div>
+          </div>
+        </div>
+        <br>
+
+        <!-- Reminder Time -->
+        <div class="mb-4">
+          <label class="form-label" for="reminderTime" style="font-weight: 600">
+            Daily Reminder Time
+          </label>
+          <input
+            type="time"
+            class="form-control"
+            id="reminderTime"
+          />
+        </div>
+
+        <!-- Submit Buttons -->
+        <div class="d-flex gap-3 mt-4">
+          <button type="submit" class="btn theme-btn text-light">
+            Create Habit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
