@@ -1,5 +1,7 @@
 # Write SQLAlchemy class models here
-from __init__ import db
+from . import db
+
+# The issues with the 'users' is still here, please fix it
 
 class users(db.model):
     user_id = db.Column("user_id", db.Integer, primary_key = True) #PK
@@ -18,6 +20,11 @@ class Partnership(db.model):
     partner_id = db.Column("id", db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users'.id))
 
+class Habits(db.model):
+    habit_id = db.Column(db.Integer, primary_key = True)#PK
+    habit_name = db.Column(db.String)
+    goal = db.Column(db.String)  
+    
 class UserHabits(db.model):
     _id = db.Column("id", db.Integer, primary_key = True) #PK
     user_id = db.Column(db.Integer, db.ForeignKey('users'.id)) #FK
@@ -27,7 +34,3 @@ class UserHabits(db.model):
     completed = db.Column(db.Boolean)
     completion_date = db.Column(db.String)
 
-class Habits(db.model):
-    habit_id = db.Column(db.Integer, primary_key = True)#PK
-    habit_name = db.Column(db.String)
-    goal = db.Column(db.String)

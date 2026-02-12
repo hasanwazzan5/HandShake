@@ -1,0 +1,44 @@
+.body {
+    display: flex;
+    align-items: center;
+}
+
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 60vh;
+}
+
+#title {
+    text-align: center;
+    padding-top: 20px;
+    padding-bottom: 80px;
+}
+
+.partnerShowcase {
+    display: flex;
+    flex-direction: row;
+    column-gap: 50px;
+    padding-bottom: 100px;
+}
+
+.theme-card {
+    background-color: #1f1b2e;
+}
+
+.theme-btn {
+    background-color: #7c6cff;
+    border: none;
+}
+
+.text-light {
+    color: #e9e7f5;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #7c6cff;
+}
