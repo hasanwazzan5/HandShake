@@ -1,7 +1,8 @@
 # Write SQLAlchemy class models here
 from . import db
 
-# The issues with the 'users' is still here, please fix it
+# The issues with the 'users' is still here, and db.model should be db.Model.
+# Run main.py to see syntax errors
 
 class users(db.model):
     user_id = db.Column("user_id", db.Integer, primary_key = True) #PK
