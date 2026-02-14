@@ -2,10 +2,6 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= False
-
 db = SQLAlchemy()
 DB_NAME = "main.db"
 
@@ -16,9 +12,13 @@ def createApp():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= False
     db.init_app(app)
     
-    from . import models
+    from .views import site
+    app.register_blueprint(site)
+
+    print("Registered routes:")  # Add this
+    print(app.url_map)  # Add this
 
     with app.app_context():
-        db.create_all
+        db.create_all()
 
     return app
