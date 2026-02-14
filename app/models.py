@@ -1,10 +1,7 @@
 # Write SQLAlchemy class models here
 from . import db
 
-# The issues with the 'users' is still here, and db.model should be db.Model.
-# Run main.py to see syntax errors
-
-class users(db.Model):
+class Users(db.Model):
     __tablename__ = "users"
 
     user_id = db.Column("user_id", db.Integer, primary_key = True) #PK
@@ -17,8 +14,8 @@ class Friends(db.Model):
     __tablename__ = "friends"
 
     Friends_id = db.Column("id", db.Integer, primary_key = True) #PK
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    friend_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key=True)
+    friend_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
 class Partnership(db.Model):
     __tablename__ = "partnership"
