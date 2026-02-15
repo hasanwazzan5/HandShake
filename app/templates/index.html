@@ -19,6 +19,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/styles.css') }}"
     />
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
     <!-- CSS and JS for the Bootstrap components-->
     <title>Home</title>
   </head>
@@ -52,8 +53,14 @@
             gap: 20px;
           "
         >
-          <a href="#" class="btn btn-primary theme-btn mt-auto">Login</a>
-          <a href="#" class="btn btn-primary theme-btn mt-auto">Register</a>
+          <button
+            onclick="goElsewhere()"
+            class="btn btn-primary theme-btn mt-auto"
+            id="target"
+          >
+            Login
+          </button>
+          <button class="btn btn-primary theme-btn mt-auto">Register</button>
         </div>
       </div>
     </div>
