@@ -1,5 +1,5 @@
 # Flask views, for later
-from flask import render_template, url_for, Blueprint
+from flask import render_template, url_for, Blueprint, request
 from . import db
 from .models import Users
 
@@ -21,3 +21,12 @@ def show_pairing():
 @site.route('/navigationTest')
 def show_navbar():
     return render_template('site/navBar.html')
+
+@site.route('/login', methods=["GET", "POST"])
+def login_test():
+    if request.method == "POST":
+        print(request.get_json())
+
+        return "OK", 200
+    
+    return "Bad", 400
