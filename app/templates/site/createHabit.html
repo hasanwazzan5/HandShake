@@ -4,18 +4,16 @@
 
 <div class="text-center mb-4">
   <h2 id="title">Create a New Habit</h2>
-  <p class="text-muted">
-    Create a new habit to track with your partner
-  </p>
-</div>
 
-<div class="pageContainer">
+</div>
+ 
+<div class="createHabit">
   <div class="card theme-card shadow" style="width: 18rem">
     <div class="card-body p-4">
       <form>
         <!-- Define Habit -->
         <div class="mb-4">
-          <label for="habitName" class="form-label" style="font-weight: 600">
+          <label for="habitName" class="text-light" style="font-weight: 600">
             Habit Name
           </label>
           <input
@@ -30,7 +28,7 @@
 
         <!-- Frequency -->
         <div class="mb-4">
-          <label class="form-label" style="font-weight: 600">
+          <label class="text-light" style="font-weight: 600">
             Frequency
           </label>
           <div class="d-flex gap-2 flex-wrap">
@@ -43,7 +41,7 @@
                 value="daily"
                 checked
               />
-              <label class="form-check-label" for="daily"> Daily </label>
+              <label class="text-alt" for="daily"> Daily </label>
             </div>
             <div class="form-check">
               <input
@@ -53,7 +51,7 @@
                 id="weekly"
                 value="weekly"
               />
-              <label class="form-check-label" for="weekly"> Weekly </label>
+              <label class="text-alt" for="weekly"> Weekly </label>
             </div>
           </div>
         </div>
@@ -61,7 +59,7 @@
 
         <!-- Reminder Time -->
         <div class="mb-4">
-          <label class="form-label" for="reminderTime" style="font-weight: 600">
+          <label class="text-light" for="reminderTime" style="font-weight: 600">
             Daily Reminder Time
           </label>
           <input

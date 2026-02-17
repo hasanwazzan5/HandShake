@@ -15,10 +15,54 @@
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/styles.css') }}"
+    />
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
     <!-- CSS and JS for the Bootstrap components-->
     <title>Home</title>
   </head>
-  <body>
-    <h3>HandShake</h3>
+  <body class="bg-dark">
+    <div class="heroContainer">
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+        "
+      >
+        <img
+          src="{{ url_for('static', filename='assets/HandShake.svg') }}"
+          alt="HandShake"
+          width="250"
+          height="250"
+          class="d-inline-block align-text-top me-3"
+        />
+        <h1 class="theme-txt" style="margin-top: 20px">HandShake.</h1>
+        <p class="text-light">
+          Where tasks meet reality, and your aspirations do too.
+        </p>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+          "
+        >
+          <button
+            onclick="goElsewhere()"
+            class="btn btn-primary theme-btn mt-auto"
+            id="target"
+          >
+            Login
+          </button>
+          <button class="btn btn-primary theme-btn mt-auto">Register</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
