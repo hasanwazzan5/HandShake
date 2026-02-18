@@ -1,12 +1,14 @@
 # Initialise Flask here
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
+import secrets
 
 db = SQLAlchemy()
 DB_NAME = "main.db"
 
 def createApp():
     app = Flask(__name__)
+    app.secret_key = secrets.token_hex(32)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]= False
