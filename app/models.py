@@ -38,6 +38,7 @@ class UserHabits(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id')) #FK
     habit_id = db.Column(db.Integer, db.ForeignKey('habits.habit_id')) #FK
     frequency = db.Column(db.Integer)
+    dailyhabit = db.Column(db.Boolean)
     progress_number = db.Column(db.Integer)
     completed = db.Column(db.Boolean)
     completion_date = db.Column(db.String)
