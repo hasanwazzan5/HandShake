@@ -1,16 +1,33 @@
 import secrets
 import string
 import datetime
-#import requests not required in the current version (if used, add to requirments.txt)
+
+#import requests #not required in the current version (if used, add to requirments.txt)
 from urllib.parse import quote
 from markupsafe import escape
 from flask import session, request, redirect, make_response
 
+from .models import Users
+from . import db
 
 UOM_AUTH_URL = "http://studentnet.cs.manchester.ac.uk/authenticate/"
 UOM_AUTH_LOGOUT_URL = "http://studentnet.cs.manchester.ac.uk/systemlogout.php"
 LOGGEDIN_URL = "http://127.0.0.1:5000/loggedin"
 
+
+class Register:
+    @staticmethod
+    def registerUser():
+        newUser = Users(username=session["username"], name=session["fullname"])
+        db.session.add(newUser)
+        db.session.commit()
+
+    @staticmethod
+    def isRegistered():
+        if Users.query.filter_by(username=session["username"]).first():
+            return True
+        else:
+            return False
 
 class Authenticator:
 
@@ -84,6 +101,8 @@ class Authenticator:
         session["username"] = escape(request.args.get("username"))
         session["fullname"] = escape(request.args.get("fullname"))
 
+        if not Register.isRegistered():
+            Register.registerUser()
 
     '''
     @staticmethod
