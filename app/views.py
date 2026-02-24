@@ -1,8 +1,9 @@
 # Flask views, for later
-from flask import render_template, url_for, Blueprint, redirect, session
+from flask import render_template, url_for, Blueprint, redirect, session, request
 from . import db
 from .models import Users
 from .authentication import Authenticator
+import os
 
 site = Blueprint('site', __name__)
 
