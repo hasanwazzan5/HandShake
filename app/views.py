@@ -1,5 +1,6 @@
 # Flask views, for later
 from flask import render_template, url_for, Blueprint, request
+from . import db
 from .models import Users
 import os
 
