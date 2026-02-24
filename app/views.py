@@ -62,6 +62,34 @@ def show_pairing():
 
 @site.route('/navigationTest')
 def show_navbar():
+    return render_template('site/navBar.html')
+
+@site.route('/login', methods=["GET", "POST"])
+def login_test():
+    if request.method == "POST":
+        print(request.get_json())
+
+        return "OK", 200
+    
+    return "Bad", 400
+
+@site.route('/cameratest')
+def show_camera():
+    return render_template("site/camera.html")
+
+@site.route('/uploadtest', methods=["POST"])
+def upload_test():
+    if request.method == "POST":
+        if 'file' not in request.files:
+            print("No file part")
+            print(request.files)
+            return "No file part", 400
+        file = request.files['file']
+        filename = file.filename
+
+        file.save(os.path.join("app/static/uploads", filename))
+    
+        return "File uploaded successfully", 200
     result = Authenticator.validateUser()
     if result: return result
 
