@@ -1,6 +1,19 @@
+:root {
+    --purple-text: #7c6cff;
+}
+
+
 .body {
     display: flex;
     align-items: center;
+}
+
+.heroContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
 }
 
 .pageContainer {
@@ -40,5 +53,9 @@
 
 .nav-link {
     font-weight: 500;
+    color: #7c6cff;
+}
+
+.theme-txt {
     color: #7c6cff;
 }
