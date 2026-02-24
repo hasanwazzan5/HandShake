@@ -16,7 +16,7 @@ def update_streak(habit_id):
         habit.streak = habit.streak + 1
     db.session.commit()
 
-@repeat(every(1).day.at("01:00")) #every day at 1 am function runs
+@repeat(every(1).minute) #every day at 1 am function runs
 def refresh_daily_habits(habit_id):
     for habit in UserHabits:
         if habit.daily and habit.completed == False: # if a daily habit and not complete reset streak
