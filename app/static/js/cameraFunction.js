@@ -21,7 +21,7 @@ snap_btn.addEventListener("click", async function() {
     formData.append('file', blob, "image.png")
 
     var dataURL = canvas.toDataURL("image/png");
-    fetch('/uploadtest', { 
+    fetch('/upload', { 
         method: 'POST',
         body: formData
     })

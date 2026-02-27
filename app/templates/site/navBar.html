@@ -51,9 +51,9 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav gap-3">
-            <a class="nav-link" aria-current="page" href="#">Home</a>
+            <a class="nav-link" aria-current="page" href="{{url_for('site.dashboard')}}">Home</a>
             <a class="nav-link" href="#">Friends</a>
-            <a class="nav-link" href="#">HandShakes</a>
+            <a class="nav-link" href="{{url_for('site.show_pairing')}}">HandShakes</a>
             <a class="nav-link" href="#">Profile</a>
           </div>
         </div>

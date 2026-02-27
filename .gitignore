@@ -1,9 +1,7 @@
 .venv/
 __pycache__/
 app/__pycache__/__init__.cpython-313.pyc
-<<<<<<< HEAD
 app/__pycache__
 app/__pycache__/
-=======
+app/static/uploads/*
 test.py
->>>>>>> 4676b33032341edf403bba8eb375f480f8c9d159
