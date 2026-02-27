@@ -11,6 +11,10 @@ site = Blueprint('site', __name__)
 def index():
     return render_template("index.html")
 
+@site.route('/dashboard')
+def dashboard():
+    return render_template("site/dashboard.html")
+
 @site.route('/login')
 def login():
     result = Authenticator.validateUser()
