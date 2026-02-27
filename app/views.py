@@ -13,38 +13,18 @@ def index():
 
 @site.route('/dashboard')
 def dashboard():
-    return render_template("site/dashboard.html")
+    result = Authenticator.validateUser()
+    if result: return result
+
+    fullname = Authenticator.getFullname()
+    return render_template("site/dashboard.html", firstname=fullname.split()[0])
 
 @site.route('/login')
 def login():
     result = Authenticator.validateUser()
     if result: return result
 
-    return redirect(url_for('site.loggedin'))
-
-@site.route('/loggedin')
-def loggedin():
-    '''
-    Page that user is sent to after logging in
-    The content of this page is temporary
-    '''
-
-    result = Authenticator.validateUser()
-    if result: return result
-
-    me = Users.query.filter_by(username=session["username"]).first()
-    
-    return f"""
-        YOU HAVE LOGGED IN! <br>
-        <br>
-        Login time: {Authenticator.getTimeAuthenticated(formatted=True)} <br>
-        <br>
-        UserID: {me.user_id} <br>
-        Fullname: {me.name} <br>
-        Avatar: {me.avatar} <br>
-        Avatar: {me.email} <br>
-        Username: {me.username} <br>
-        """
+    return redirect(url_for('site.dashboard'))
 
 @site.route('/logout')
 def logout():
@@ -65,24 +45,11 @@ def show_pairing():
 
     return render_template("site/pairingPage.html")
 
-@site.route('/navigationTest')
-def show_navbar():
-    return render_template('site/navBar.html')
-
-@site.route('/login', methods=["GET", "POST"])
-def login_test():
-    if request.method == "POST":
-        print(request.get_json())
-
-        return "OK", 200
-    
-    return "Bad", 400
-
-@site.route('/cameratest')
+@site.route('/camera')
 def show_camera():
     return render_template("site/camera.html")
 
-@site.route('/uploadtest', methods=["POST"])
+@site.route('/upload', methods=["POST"])
 def upload_test():
     if request.method == "POST":
         if 'file' not in request.files:

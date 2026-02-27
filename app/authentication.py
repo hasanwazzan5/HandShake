@@ -12,7 +12,7 @@ from . import db
 
 UOM_AUTH_URL = "http://studentnet.cs.manchester.ac.uk/authenticate/"
 UOM_AUTH_LOGOUT_URL = "http://studentnet.cs.manchester.ac.uk/systemlogout.php"
-LOGGEDIN_URL = "http://127.0.0.1:5000/loggedin"
+LOGGEDIN_URL = "http://127.0.0.1:5000/dashboard"
 
 
 class Register:

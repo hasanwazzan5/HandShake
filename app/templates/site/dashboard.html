@@ -3,7 +3,7 @@ block content %}
 
 <div class="dashboardPage">
   <div class="text-center mb-4">
-    <h2 id="title">Welcome Back, User!</h2>
+    <h2 id="title">Welcome Back, {{firstname}}!</h2>
   </div>
 
   <!-- Active Habits Section -->
@@ -45,7 +45,7 @@ block content %}
       </div>
     </div>
     <div>
-      <a href="#" class="btn btn-lg theme-btn text-light mt-5"
+      <a href="{{url_for('site.show_habit')}}" class="btn btn-lg theme-btn text-light mt-5"
         >+ Create New Habit</a
       >
       <!-- #: /createHabit.html -->
