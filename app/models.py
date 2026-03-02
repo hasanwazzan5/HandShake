@@ -42,4 +42,5 @@ class UserHabits(db.Model):
     progress_number = db.Column(db.Integer)
     completed = db.Column(db.Boolean)
     completion_date = db.Column(db.String)
+    streak = db.Column(db.Integer)
 
