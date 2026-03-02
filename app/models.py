@@ -21,7 +21,7 @@ class Partnership(db.Model):
     __tablename__ = "partnership"
 
     Partnership_id = db.Column("id", db.Integer, primary_key = True)#PK
-    partner_id = db.Column(db.Integer)
+    partner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
 class Habits(db.Model):
