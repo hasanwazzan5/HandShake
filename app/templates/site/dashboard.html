@@ -1,23 +1,29 @@
-{% extends "site/navBar.html" %} {% block title %}Dashboard{% endblock %} {%
-block content %}
+{% extends "site/navBar.html" %} 
+{% block title %}Dashboard{% endblock %} 
+{% block content %}
 
 <div class="dashboardPage">
   <div class="text-center mb-4">
-    <h2 id="title">Welcome Back, {{firstname}}!</h2>
+    <h2 id="title">Welcome!</h2>
   </div>
 
   <!-- Active Habits Section -->
   <div class="dashboard-section">
     <h3 class="theme-txt">Your Active Habits</h3>
-
+    
     <div class="habit-cards">
       <!-- Habit Card 1 -->
       <div class="card theme-card shadow" style="width: 18rem">
         <div class="card-body">
           <h5 class="card-title text-light">Morning Gym</h5>
           <p class="text-alt">Partner: Hasan</p>
-          <div class="streak-info">
-            <span class="badge bg-success">7 Day Streak</span>
+          <div class="habit-progress">
+            <div class="streak-info mb-2">
+              <span class="badge bg-success">7 Day Streak</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+              <div class="progress-bar bg-success" style="width: 87%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -27,8 +33,13 @@ block content %}
         <div class="card-body">
           <h5 class="card-title text-light">Daily Coding</h5>
           <p class="text-alt">Partner: Daniel</p>
-          <div class="streak-info">
-            <span class="badge bg-success">12 Day Streak</span>
+          <div class="habit-progress">
+            <div class="streak-info mb-2">
+              <span class="badge bg-success">15 Day Streak</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+              <div class="progress-bar bg-success" style="width: 90%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -38,18 +49,20 @@ block content %}
         <div class="card-body">
           <h5 class="card-title text-light">Reading</h5>
           <p class="text-alt">Partner: Yuka</p>
-          <div class="streak-info">
-            <span class="badge bg-success">3 Day Streak</span>
+          <div class="habit-progress">
+            <div class="streak-info mb-2">
+              <span class="badge bg-success">6 Day Streak</span>
+            </div>
+            <div class="progress" style="height: 12px;">
+              <div class="progress-bar bg-success" style="width: 67%"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <div>
-      <a href="{{url_for('site.show_habit')}}" class="btn btn-lg theme-btn text-light mt-5"
-        >+ Create New Habit</a
-      >
-      <!-- #: /createHabit.html -->
-    </div>
+  <div>
+    <a href="#" class="btn btn-lg theme-btn text-light mt-5">+ Create New Habit</a>  
+  </div>
   </div>
 </div>
 
