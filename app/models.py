@@ -24,6 +24,12 @@ class Partnership(db.Model):
     partner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
+class PartnershipRequest(db.Model):
+    partnership_request_id = db.Column(db.Integer, primary_key=True)#PK
+    sender_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    receiver_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    status = db.Column(db.String(20), default="pending")
+
 class Habits(db.Model):
     __tablename__ = "habits"
 

@@ -4,6 +4,7 @@ from . import db
 from .models import Users
 from .authentication import Authenticator
 import os
+from .partnership import Partner
 
 site = Blueprint('site', __name__)
 
@@ -43,7 +44,51 @@ def show_pairing():
     result = Authenticator.validateUser()
     if result: return result
 
-    return render_template("site/pairingPage.html")
+    requests = Partner.GetPendingPairRequests()
+
+    return render_template("site/pairingPage.html")#, requests=requests) #use this arg to connect to front end
+
+@site.route('/send_pair_request', methods=["POST"])
+def send_partnership_request():
+    result = Authenticator.validateUser()
+    if result: return result
+
+    receiver_id = int(request.form["receiver_id"]) #use "receiver_id" in front end form
+    noError = Partner.pairRequest(receiver_id)
+    if not noError: return "Forbidden", 400
+
+    return redirect(url_for("show_pairing"))
+
+@site.route('/accept_pair_request', methods=["POST"])
+def accept_partnership_request():
+    result = Authenticator.validateUser()
+    if result: return result
+
+    requestId = int(request.form["request_id"]) #use "request_id" in front end form
+    noError = Partner.pairAccept(requestId)
+    if not noError: return "Forbidden", 403
+
+    return redirect(url_for("show_pairing"))
+
+@site.route("/reject_pair_request", methods=["POST"])
+def reject_partnership_request():
+    result = Authenticator.validateUser()
+    if result: return result
+
+
+    requestId = int(request.form["request_id"]) #use "request_id" in front end form
+    noError = Partner.pairReject(requestId)
+    if not noError: return "Forbidden", 403
+
+    return redirect(url_for("show_pairing"))
+
+@site.route("/remove_pairing", methods=["POST"])
+def remove_partnership():
+
+    partnerId = int(request.form["partner_id"]) #use "partner_id" in front end form
+    Partner.unPair(partnerId)
+
+    return redirect("/friends")
 
 @site.route('/camera')
 def show_camera():
