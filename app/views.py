@@ -84,18 +84,26 @@ def reject_partnership_request():
 
 @site.route("/remove_pairing", methods=["POST"])
 def remove_partnership():
+    result = Authenticator.validateUser()
+    if result: return result
 
     partnerId = int(request.form["partner_id"]) #use "partner_id" in front end form
     Partner.unPair(partnerId)
 
-    return redirect("/friends")
+    return redirect(url_for("show_pairing"))
 
 @site.route('/camera')
 def show_camera():
+    result = Authenticator.validateUser()
+    if result: return result
+
     return render_template("site/camera.html")
 
 @site.route('/upload', methods=["POST"])
 def upload_test():
+    result = Authenticator.validateUser()
+    if result: return result
+
     if request.method == "POST":
         if 'file' not in request.files:
             print("No file part")
@@ -107,7 +115,5 @@ def upload_test():
         file.save(os.path.join("app/static/uploads", filename))
     
         return "File uploaded successfully", 200
-    result = Authenticator.validateUser()
-    if result: return result
 
     return render_template('site/navBar.html')
