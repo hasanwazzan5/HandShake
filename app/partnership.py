@@ -5,85 +5,68 @@ from .models import Partnership, Users, PartnershipRequest
 
 class Partner:
     @staticmethod
-    def pairRequest(receiverId):
+    def pairRequest(userHabitId):
         currentUser = Users.query.filter_by(username=session["username"]).first()
-
-        low = min(receiverId, currentUser.user_id)
-        high = max(receiverId, currentUser.user_id)
-        if Partner.arePartnered(low, high):
-            return False
-
-        if receiverId == currentUser.user_id:
-            return False
 
         existing = PartnershipRequest.query.filter_by(
             sender_id=currentUser.user_id,
-            receiver_id=receiverId,
-            status="pending"
+            user_userhabit_id=userHabitId,
         ).first()
         
         if existing:
             return False
 
-        req = PartnershipRequest(sender_id=currentUser.user_id, receiver_id=receiverId)
+        req = PartnershipRequest(
+            sender_id=currentUser.user_id,
+            user_userhabit_id=userHabitId,
+            status="pending"
+        )
+        
         db.session.add(req)
         db.session.commit()
 
         return True
 
     @staticmethod
-    def pairAccept(requestId):
+    def pairAccept(requestId, newUserHabitId):
         currentUser = Users.query.filter_by(username=session["username"]).first()
 
         req = PartnershipRequest.query.filter_by(partnership_request_id=requestId).first()
 
-        if req.receiver_id != currentUser.user_id:
+        if req.status != "pending":
             return False
+       
+       #creating partnership
+        partnerId = req.sender_id
 
-        req.status = "accepted"
-        db.session.commit()
+        low = min((partnerId, req.user_userhabit_id), (currentUser.user_id, newUserHabitId))
+        high = max((partnerId, req.user_userhabit_id), (currentUser.user_id, newUserHabitId))
+
+        if not Partner.arePartnered(low, high):
+            newPartnership = Partnership(
+                partner_id=low[0],
+                user_id=high[1],
+                partner_userhabit_id=low[0],
+                user_userhabit_id=high[1]
+            )
+            db.session.add(newPartnership)
+            req.status = "accepted" 
+            db.session.commit()
+        else:
+            return False
         
-        Partner.pair(req.sender_id)
-
-        return True
-
-
-    @staticmethod
-    def pairReject(requestId):
-        currentUser = Users.query.filter_by(username=session["username"]).first()
-
-        req = PartnershipRequest.query.filter_by(partnership_request_id=requestId).first()
-
-        if req.receiver_id != currentUser.user_id:
-            return False
-
-        req.status = "rejected"
-        db.session.commit()
-
         return True
 
     @staticmethod
     def GetPendingPairRequests():
         currentUser = Users.query.filter_by(username=session["username"]).first()
 
-        requests = PartnershipRequest.query.filter_by(
-            receiver_id=currentUser.user_id,
-            status="pending"
+        requests = PartnershipRequest.query.filter(
+            PartnershipRequest.status == "pending",
+            PartnershipRequest.sender_id != currentUser.user_id
         ).all()
 
-        return requests 
-
-    @staticmethod
-    def pair(partnerId):
-        currentUser = Users.query.filter_by(username=session["username"]).first()
-
-        low = min(partnerId, currentUser.user_id)
-        high = max(partnerId, currentUser.user_id)
-
-        if not Partner.arePartnered(low, high):
-            newPartnership = Partnership(partner_id=low, user_id=high)
-            db.session.add(newPartnership)
-            db.session.commit()
+        return requests
 
     @staticmethod
     def unPair(partnerId):
@@ -92,7 +75,7 @@ class Partner:
         low = min(partnerId, currentUser.user_id)
         high = max(partnerId, currentUser.user_id)
 
-        if not Partner.arePartnered(low, high):
+        if Partner.arePartnered(low, high):
             partnership = Partnership.query.filter_by(partner_id=low, user_id=high).first()
             db.session.delete(partnership)
             db.session.commit()

@@ -21,13 +21,15 @@ class Partnership(db.Model):
     __tablename__ = "partnership"
 
     Partnership_id = db.Column("id", db.Integer, primary_key = True)#PK
-    partner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    partner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))#FK
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))#FK
+    partner_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
+    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
 
 class PartnershipRequest(db.Model):
     partnership_request_id = db.Column(db.Integer, primary_key=True)#PK
-    sender_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
-    receiver_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))
+    sender_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))#FK
+    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
     status = db.Column(db.String(20), default="pending")
 
 class Habits(db.Model):

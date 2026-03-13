@@ -53,8 +53,8 @@ def send_partnership_request():
     result = Authenticator.validateUser()
     if result: return result
 
-    receiver_id = int(request.form["receiver_id"]) #use "receiver_id" in front end form
-    noError = Partner.pairRequest(receiver_id)
+    senderUserhabitId = int(request.form["sender_userhabit_id"]) #use "sender_userhabit_id" in front end form
+    noError = Partner.pairRequest(senderUserhabitId)
     if not noError: return "Forbidden", 400
 
     return redirect(url_for("show_pairing"))
@@ -65,19 +65,9 @@ def accept_partnership_request():
     if result: return result
 
     requestId = int(request.form["request_id"]) #use "request_id" in front end form
-    noError = Partner.pairAccept(requestId)
-    if not noError: return "Forbidden", 403
-
-    return redirect(url_for("show_pairing"))
-
-@site.route("/reject_pair_request", methods=["POST"])
-def reject_partnership_request():
-    result = Authenticator.validateUser()
-    if result: return result
-
-
-    requestId = int(request.form["request_id"]) #use "request_id" in front end form
-    noError = Partner.pairReject(requestId)
+    newUserhabitId = int(request.form["new_userhabit_id"]) #use "new_userhabit_id" in front end form
+    
+    noError = Partner.pairAccept(requestId, newUserhabitId)
     if not noError: return "Forbidden", 403
 
     return redirect(url_for("show_pairing"))
