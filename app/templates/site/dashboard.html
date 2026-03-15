@@ -63,7 +63,7 @@ block content %}
     <div>
       <a
         href="{{url_for('site.show_habit')}}"
-        class="btn btn-lg theme-btn text-light mt-5"
+        class="btn btn-md theme-btn text-light mt-5"
         >+ Create New Habit</a
       >
       <!-- #: /createHabit.html -->
@@ -122,6 +122,7 @@ block content %}
               class="btn btn-secondary"
               data-bs-dismiss="modal"
               id="tryagain"
+              onclick="loadCamera()"
             >
               Try again...
             </button>
@@ -203,9 +204,14 @@ block content %}
               <p class="text-light">
                 Your next submission is due on dd/mm/yyyy.
               </p>
-              <button class="theme-btn btn mt-2 text-light">
+              <button
+                data-bs-toggle="modal"
+                data-bs-target="#myModal"
+                class="theme-btn btn mt-2 text-light"
+                onclick="loadCamera()"
+              >
                 Send next submission
-               </button>
+              </button>
             </div>
           </div>
           <div class="modal-footer">
@@ -221,8 +227,7 @@ block content %}
       </div>
     </div>
   </div>
-
-  {% block scripts %}
-  <script src="{{ url_for('static', filename='js/cameraFunction.js') }}"></script>
-  {% endblock %} {% endblock %}
 </div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cameraFunction.js') }}"></script>
+{% endblock %} {% endblock %}
