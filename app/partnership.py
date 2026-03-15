@@ -1,12 +1,13 @@
 # functions to manage partnerships in the database
 from flask import session
 from . import db
-from .models import Partnership, Users, PartnershipRequest
+from .models import Partnership, PartnershipRequest
+from .authentication import Authenticator
 
 class Partner:
     @staticmethod
     def pairRequest(userHabitId):
-        currentUser = Partner.getCurrentUser()
+        currentUser = Authenticator.getCurrentUser()
 
         existing = PartnershipRequest.query.filter_by(
             sender_id=currentUser.user_id,
@@ -29,7 +30,7 @@ class Partner:
 
     @staticmethod
     def pairAccept(requestId, newUserHabitId):
-        currentUser = Partner.getCurrentUser()
+        currentUser = Authenticator.getCurrentUser()
 
         req = PartnershipRequest.query.filter_by(partnership_request_id=requestId).first()
 
@@ -59,7 +60,7 @@ class Partner:
 
     @staticmethod
     def GetPendingPairRequests():
-        currentUser = Partner.getCurrentUser()
+        currentUser = Authenticator.getCurrentUser()
 
         requests = PartnershipRequest.query.filter(
             PartnershipRequest.status == "pending",
@@ -70,7 +71,7 @@ class Partner:
 
     @staticmethod
     def unPair(partnerId):
-        currentUser = Partner.getCurrentUser()
+        currentUser = Authenticator.getCurrentUser()
 
         low = min(partnerId, currentUser.user_id)
         high = max(partnerId, currentUser.user_id)
@@ -88,8 +89,3 @@ class Partner:
             return True
         else:
             return False
-        
-    @staticmethod
-    def getCurrentUser():
-        currentUser = Users.query.filter_by(username=session["username"]).first()
-        return currentUser
