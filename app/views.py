@@ -1,7 +1,7 @@
 # Flask views, for later
 from flask import render_template, url_for, Blueprint, redirect, session, request
 from . import db
-from .models import Users
+from .models import UserHabits
 from .authentication import Authenticator
 import os
 
@@ -37,6 +37,29 @@ def show_habit():
     if result: return result
 
     return render_template("site/createHabit.html")
+
+@site.route('/createhabit_submit', methods=['POST'])
+def add_habit():
+    data = request.get_json()
+
+    # Validate required fields
+    if not data or 'habit_name' not in data or 'goal' not in data:
+        return "error habit_name and goal are required", 400
+
+    new_habit = UserHabits(
+        user_id=Authenticator.getCurrentUser().user_id,
+        habit_name=data['habit_name'],
+        frequency=data['frequency'],
+        goal=data['goal']
+    )
+
+    db.session.add(new_habit)
+    db.session.commit()
+
+    return f"""
+        "Habit added successfully",
+        habit: {new_habit.to_dict()}
+        """, 201
 
 @site.route('/pairingpage')
 def show_pairing():
