@@ -148,3 +148,7 @@ class Authenticator:
     def invalidateUser():
         session.clear()
         return redirect(UOM_AUTH_LOGOUT_URL)
+    
+    @staticmethod
+    def getCurrentUser():
+        return Users.query.filter_by(username=session["username"]).first()
