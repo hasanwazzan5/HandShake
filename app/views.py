@@ -31,6 +31,7 @@ def logout():
 
 # The two routes here are temporary, just for testing the appearance of the html pages.
 @site.route('/createhabit', methods=['GET', 'POST'])
+@authenticate
 def show_habit():
     result = Authenticator.validateUser()
     if result: return result
