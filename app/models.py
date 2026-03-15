@@ -20,22 +20,22 @@ class Friends(db.Model):
 class Partnership(db.Model):
     __tablename__ = "partnership"
 
-    Partnership_id = db.Column("id", db.Integer, primary_key = True)#PK
+    Partnership_id = db.Column(db.Integer, primary_key = True)#PK
     partner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))#FK
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))#FK
-    partner_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
-    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
+    partner_userhabit_id = db.Column(db.Integer, db.ForeignKey('user_habits.userhabit_id'))#FK
+    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('user_habits.userhabit_id'))#FK
 
 class PartnershipRequest(db.Model):
     partnership_request_id = db.Column(db.Integer, primary_key=True)#PK
     sender_id = db.Column(db.Integer, db.ForeignKey("users.user_id"))#FK
-    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('userhabits.userhabit_id'))#FK
+    user_userhabit_id = db.Column(db.Integer, db.ForeignKey('user_habits.userhabit_id'))#FK
     status = db.Column(db.String(20), default="pending")
-    
+
 class UserHabits(db.Model):
     __tablename__ = "user_habits"
 
-    userhabit_id = db.Column("id", db.Integer, primary_key = True) #PK
+    userhabit_id = db.Column(db.Integer, primary_key = True) #PK
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id')) #FK
 
     habit_name = db.Column(db.String)
@@ -55,4 +55,3 @@ class UserHabits(db.Model):
             "frequency":  self.frequency,
             "goal":       self.goal
         }
-
