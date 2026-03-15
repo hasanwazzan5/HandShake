@@ -2,7 +2,6 @@
     --purple-text: #7c6cff;
 }
 
-
 .body {
     display: flex;
     align-items: center;
@@ -44,7 +43,10 @@
 
 .theme-btn {
     background-color: #7c6cff;
-    border: none;
+}
+
+.theme-btn:hover {
+    background-color: #a89cff;
 }
 
 .text-light {
@@ -74,10 +76,12 @@
 .dashboardPage {
     padding: 20px;              
 }
+
 .dashboard-section {
     margin-bottom: 50px;
     text-align: center;     
 }
+
 .habit-cards {
     display: flex;                  
     gap: 30px;                    
