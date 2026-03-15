@@ -6,7 +6,7 @@ from .models import Partnership, Users, PartnershipRequest
 class Partner:
     @staticmethod
     def pairRequest(userHabitId):
-        currentUser = Users.query.filter_by(username=session["username"]).first()
+        currentUser = Partner.getCurrentUser()
 
         existing = PartnershipRequest.query.filter_by(
             sender_id=currentUser.user_id,
@@ -29,7 +29,7 @@ class Partner:
 
     @staticmethod
     def pairAccept(requestId, newUserHabitId):
-        currentUser = Users.query.filter_by(username=session["username"]).first()
+        currentUser = Partner.getCurrentUser()
 
         req = PartnershipRequest.query.filter_by(partnership_request_id=requestId).first()
 
@@ -59,7 +59,7 @@ class Partner:
 
     @staticmethod
     def GetPendingPairRequests():
-        currentUser = Users.query.filter_by(username=session["username"]).first()
+        currentUser = Partner.getCurrentUser()
 
         requests = PartnershipRequest.query.filter(
             PartnershipRequest.status == "pending",
@@ -70,7 +70,7 @@ class Partner:
 
     @staticmethod
     def unPair(partnerId):
-        currentUser = Users.query.filter_by(username=session["username"]).first()
+        currentUser = Partner.getCurrentUser()
 
         low = min(partnerId, currentUser.user_id)
         high = max(partnerId, currentUser.user_id)
@@ -88,3 +88,8 @@ class Partner:
             return True
         else:
             return False
+        
+    @staticmethod
+    def getCurrentUser():
+        currentUser = Users.query.filter_by(username=session["username"]).first()
+        return currentUser
