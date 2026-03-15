@@ -1,5 +1,4 @@
 # functions to manage partnerships in the database
-from flask import session
 from . import db
 from .models import Partnership, PartnershipRequest
 from .authentication import Authenticator
