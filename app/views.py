@@ -4,6 +4,7 @@ from . import db
 from .models import UserHabits
 from .authentication import Authenticator
 import os
+from .partnership import Partner
 
 site = Blueprint('site', __name__)
 
@@ -63,14 +64,56 @@ def show_pairing():
     result = Authenticator.validateUser()
     if result: return result
 
-    return render_template("site/pairingPage.html")
+    requests = Partner.GetPendingPairRequests()
+
+    return render_template("site/pairingPage.html")#, requests=requests) #use this arg to connect to front end
+
+@site.route('/send_pair_request', methods=["POST"])
+def send_partnership_request():
+    result = Authenticator.validateUser()
+    if result: return result
+
+    senderUserhabitId = int(request.form["sender_userhabit_id"]) #use "sender_userhabit_id" in front end form
+    noError = Partner.pairRequest(senderUserhabitId)
+    if not noError: return "Forbidden", 400
+
+    return redirect(url_for("show_pairing"))
+
+@site.route('/accept_pair_request', methods=["POST"])
+def accept_partnership_request():
+    result = Authenticator.validateUser()
+    if result: return result
+
+    requestId = int(request.form["request_id"]) #use "request_id" in front end form
+    newUserhabitId = int(request.form["new_userhabit_id"]) #use "new_userhabit_id" in front end form
+    
+    noError = Partner.pairAccept(requestId, newUserhabitId)
+    if not noError: return "Forbidden", 403
+
+    return redirect(url_for("show_pairing"))
+
+@site.route("/remove_pairing", methods=["POST"])
+def remove_partnership():
+    result = Authenticator.validateUser()
+    if result: return result
+
+    partnerId = int(request.form["partner_id"]) #use "partner_id" in front end form
+    Partner.unPair(partnerId)
+
+    return redirect(url_for("show_pairing"))
 
 @site.route('/camera')
 def show_camera():
+    result = Authenticator.validateUser()
+    if result: return result
+
     return render_template("site/camera.html")
 
 @site.route('/upload', methods=["POST"])
 def upload_test():
+    result = Authenticator.validateUser()
+    if result: return result
+
     if request.method == "POST":
         if 'file' not in request.files:
             print("No file part")
@@ -82,7 +125,5 @@ def upload_test():
         file.save(os.path.join("app/static/uploads", filename))
     
         return "File uploaded successfully", 200
-    result = Authenticator.validateUser()
-    if result: return result
 
     return render_template('site/navBar.html')
