@@ -56,10 +56,7 @@ def add_habit():
     db.session.add(new_habit)
     db.session.commit()
 
-    return f"""
-        "Habit added successfully",
-        habit: {new_habit.to_dict()}
-        """, 201
+    return redirect(url_for('site.show_habit'))
 
 @site.route('/pairingpage')
 def show_pairing():
