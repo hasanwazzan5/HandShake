@@ -17,6 +17,7 @@ def index():
 def dashboard():
 
     fullname = Authenticator.getFullname()
+    
     return render_template("site/dashboard.html", firstname=fullname.split()[0])
 
 @site.route('/login')
@@ -29,31 +30,38 @@ def logout():
     return Authenticator.invalidateUser()
 
 # The two routes here are temporary, just for testing the appearance of the html pages.
-@site.route('/createhabit')
-@authenticate
+@site.route('/createhabit', methods=['GET', 'POST'])
 def show_habit():
+    result = Authenticator.validateUser()
+    if result: return result
+
+
+    if request.method == "POST":
+        data = request.get_json()
+
+        # Validate required fields
+        if not data or 'habit_name' not in data or 'goal' not in data:
+            return "error habit_name and goal are required", 400
+
+        new_habit = UserHabits(
+            user_id=Authenticator.getCurrentUser().user_id,
+            habit_name=data['habit_name'],
+            frequency=data['frequency'],
+            goal=data['goal']
+        )
+
+        try:
+            db.session.add(new_habit)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error adding habit: {e}")
+            return "An error occurred while adding the habit", 500
+        # A safeguard
+        print("Habit added successfully!")
+        print(new_habit.to_dict())
+
     return render_template("site/createHabit.html")
-
-@site.route('/createhabit_submit', methods=['POST'])
-@authenticate
-def add_habit():
-    data = request.get_json()
-
-    # Validate required fields
-    if not data or 'habit_name' not in data or 'goal' not in data:
-        return "error habit_name and goal are required", 400
-
-    new_habit = UserHabits(
-        user_id=Authenticator.getCurrentUser().user_id,
-        habit_name=data['habit_name'],
-        frequency=data['frequency'],
-        goal=data['goal']
-    )
-
-    db.session.add(new_habit)
-    db.session.commit()
-
-    return redirect(url_for('site.show_habit'))
 
 @site.route('/pairingpage')
 @authenticate
