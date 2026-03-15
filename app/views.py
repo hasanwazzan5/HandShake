@@ -33,10 +33,6 @@ def logout():
 @site.route('/createhabit', methods=['GET', 'POST'])
 @authenticate
 def show_habit():
-    result = Authenticator.validateUser()
-    if result: return result
-
-
     if request.method == "POST":
         data = request.get_json()
 
