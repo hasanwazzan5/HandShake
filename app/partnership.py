@@ -42,11 +42,11 @@ class Partner:
         low = min((partnerId, req.user_userhabit_id), (currentUser.user_id, newUserHabitId))
         high = max((partnerId, req.user_userhabit_id), (currentUser.user_id, newUserHabitId))
 
-        if not Partner.arePartnered(low, high):
+        if not Partner.arePartnered(low[0], high[0]):
             newPartnership = Partnership(
                 partner_id=low[0],
-                user_id=high[1],
-                partner_userhabit_id=low[0],
+                user_id=high[0],
+                partner_userhabit_id=low[1],
                 user_userhabit_id=high[1]
             )
             db.session.add(newPartnership)

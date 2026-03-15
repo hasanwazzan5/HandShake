@@ -54,6 +54,12 @@ def show_habit():
             db.session.rollback()
             print(f"Error adding habit: {e}")
             return "An error occurred while adding the habit", 500
+        
+
+        senderUserhabitId = new_habit.userhabit_id
+        noError = Partner.pairRequest(senderUserhabitId)
+        if not noError: return "Forbidden", 400
+
         # A safeguard
         print("Habit added successfully!")
         print(new_habit.to_dict())
@@ -67,20 +73,11 @@ def show_pairing():
 
     return render_template("site/pairingPage.html")#, requests=requests) #use this arg to connect to front end
 
-@site.route('/send_pair_request', methods=["POST"])
-@authenticate
-def send_partnership_request():
-    senderUserhabitId = int(request.form["sender_userhabit_id"]) #use "sender_userhabit_id" in front end form
-    noError = Partner.pairRequest(senderUserhabitId)
-    if not noError: return "Forbidden", 400
-
-    return redirect(url_for("show_pairing"))
-
 @site.route('/accept_pair_request', methods=["POST"])
 @authenticate
 def accept_partnership_request():
-    requestId = int(request.form["request_id"]) #use "request_id" in front end form
-    newUserhabitId = int(request.form["new_userhabit_id"]) #use "new_userhabit_id" in front end form
+    requestId = int(request.json["request_id"]) #use "request_id" in front end button
+    newUserhabitId = int(request.json["new_userhabit_id"]) #use "new_userhabit_id" in front end button
     
     noError = Partner.pairAccept(requestId, newUserhabitId)
     if not noError: return "Forbidden", 403
@@ -90,7 +87,7 @@ def accept_partnership_request():
 @site.route("/remove_pairing", methods=["POST"])
 @authenticate
 def remove_partnership():
-    partnerId = int(request.form["partner_id"]) #use "partner_id" in front end form
+    partnerId = int(request.json["partner_id"]) #use "partner_id" in front end button
     Partner.unPair(partnerId)
 
     return redirect(url_for("show_pairing"))
