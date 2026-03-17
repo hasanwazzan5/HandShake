@@ -1,9 +1,10 @@
 # Flask views, for later
 from flask import render_template, url_for, Blueprint, redirect, session, request
 from . import db
-from .models import Users
-from .authentication import Authenticator
+from .models import UserHabits
+from .authentication import Authenticator, authenticate
 import os
+from .partnership import Partner
 
 site = Blueprint('site', __name__)
 
@@ -12,18 +13,16 @@ def index():
     return render_template("index.html")
 
 @site.route('/dashboard')
+@authenticate
 def dashboard():
-    result = Authenticator.validateUser()
-    if result: return result
 
     fullname = Authenticator.getFullname()
+    
     return render_template("site/dashboard.html", firstname=fullname.split()[0])
 
 @site.route('/login')
+@authenticate
 def login():
-    result = Authenticator.validateUser()
-    if result: return result
-
     return redirect(url_for('site.dashboard'))
 
 @site.route('/logout')
@@ -31,25 +30,75 @@ def logout():
     return Authenticator.invalidateUser()
 
 # The two routes here are temporary, just for testing the appearance of the html pages.
-@site.route('/createhabit')
+@site.route('/createhabit', methods=['GET', 'POST'])
+@authenticate
 def show_habit():
-    result = Authenticator.validateUser()
-    if result: return result
+    if request.method == "POST":
+        data = request.get_json()
+
+        # Validate required fields
+        if not data or 'habit_name' not in data or 'goal' not in data:
+            return "error habit_name and goal are required", 400
+
+        new_habit = UserHabits(
+            user_id=Authenticator.getCurrentUser().user_id,
+            habit_name=data['habit_name'],
+            frequency=data['frequency'],
+            goal=data['goal']
+        )
+
+        try:
+            db.session.add(new_habit)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error adding habit: {e}")
+            return "An error occurred while adding the habit", 500
+        
+
+        senderUserhabitId = new_habit.userhabit_id
+        noError = Partner.pairRequest(senderUserhabitId)
+        if not noError: return "Forbidden", 400
+
+        # A safeguard
+        print("Habit added successfully!")
+        print(new_habit.to_dict())
 
     return render_template("site/createHabit.html")
 
 @site.route('/pairingpage')
+@authenticate
 def show_pairing():
-    result = Authenticator.validateUser()
-    if result: return result
+    requests = Partner.GetPendingPairRequests()
 
-    return render_template("site/pairingPage.html")
+    return render_template("site/pairingPage.html")#, requests=requests) #use this arg to connect to front end
+
+@site.route('/accept_pair_request', methods=["POST"])
+@authenticate
+def accept_partnership_request():
+    requestId = int(request.json["request_id"]) #use "request_id" in front end button
+    newUserhabitId = int(request.json["new_userhabit_id"]) #use "new_userhabit_id" in front end button
+    
+    noError = Partner.pairAccept(requestId, newUserhabitId)
+    if not noError: return "Forbidden", 403
+
+    return redirect(url_for("show_pairing"))
+
+@site.route("/remove_pairing", methods=["POST"])
+@authenticate
+def remove_partnership():
+    partnerId = int(request.json["partner_id"]) #use "partner_id" in front end button
+    Partner.unPair(partnerId)
+
+    return redirect(url_for("show_pairing"))
 
 @site.route('/camera')
+@authenticate
 def show_camera():
     return render_template("site/camera.html")
 
 @site.route('/upload', methods=["POST"])
+@authenticate
 def upload_test():
     if request.method == "POST":
         if 'file' not in request.files:
@@ -62,7 +111,5 @@ def upload_test():
         file.save(os.path.join("app/static/uploads", filename))
     
         return "File uploaded successfully", 200
-    result = Authenticator.validateUser()
-    if result: return result
 
     return render_template('site/navBar.html')

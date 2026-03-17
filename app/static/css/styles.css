@@ -88,3 +88,7 @@
     flex-wrap: wrap;              
     justify-content: center;  
 }
+
+.btn:hover {
+    background-color: purple;
+}

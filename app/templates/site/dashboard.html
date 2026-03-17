@@ -25,6 +25,14 @@
               <div class="progress-bar bg-success" style="width: 87%"></div>
             </div>
           </div>
+          <button
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#statsModal"
+            class="theme-btn btn mt-2 text-light"
+          >
+            View Details
+          </button>
         </div>
       </div>
 
@@ -41,6 +49,14 @@
               <div class="progress-bar bg-success" style="width: 90%"></div>
             </div>
           </div>
+          <button
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#myModal"
+            class="theme-btn btn mt-2 text-light"
+          >
+            Register your streak
+          </button>
         </div>
       </div>
 
@@ -67,3 +83,174 @@
 </div>
 
 {% endblock %}
+    <div>
+      <a
+        href="{{url_for('site.show_habit')}}"
+        class="btn btn-md theme-btn text-light mt-5"
+        >+ Create New Habit</a
+      >
+      <!-- #: /createHabit.html -->
+    </div>
+
+    <div class="modal" id="myModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark">
+          <div class="modal-header border-dark">
+            <h5 class="modal-title text-light">Snap a picture of your task!</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body bg-dark">
+            <video id="video" width="50%" height="auto" autoplay></video>
+          </div>
+          <div class="modal-footer border-dark bg-dark">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" id="snap" class="btn btn-primary">
+              Snap a picture!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for displaying the captured image -->
+    <div class="modal" id="otherModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark">
+          <div class="modal-header border-dark">
+            <h5 class="modal-title text-light">Happy?</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body bg-dark">
+            <canvas id="canvas" width="550" height="410"></canvas>
+          </div>
+          <div class="modal-footer border-dark bg-dark">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+              id="tryagain"
+              onclick="loadCamera()"
+            >
+              Try again...
+            </button>
+            <button type="button" id="save" class="btn btn-primary">
+              Save!
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for displaying the statistics -->
+    <div class="modal" id="statsModal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+          <div class="modal-header border-light">
+            <h5 class="modal-title text-light">Statistics</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="streak-statistics">
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <h6 class="text-light mb-2">Current Streak</h6>
+                  <p class="text-warning fs-4 fw-bold">12 Days</p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-light mb-2">Longest Streak</h6>
+                  <p class="text-info fs-4 fw-bold">15 Days</p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-light mb-2">Total Completions</h6>
+                  <p class="text-success fs-4 fw-bold">42</p>
+                </div>
+                <div class="col-md-6">
+                  <h6 class="text-light mb-2">Completion Rate</h6>
+                  <p class="text-danger fs-4 fw-bold">85%</p>
+                </div>
+              </div>
+
+              <table class="table table-dark table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th>Submission date (dd/mm/yy)</th>
+                    <th>Image</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>15/01/24</td>
+                    <td><a href="#" class="text-info">View Image</a></td>
+                    <td><span class="badge bg-success">Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>14/01/24</td>
+                    <td><a href="#" class="text-info">View Image</a></td>
+                    <td><span class="badge bg-success">Approved</span></td>
+                  </tr>
+                  <tr>
+                    <td>13/01/24</td>
+                    <td><a href="#" class="text-info">View Image</a></td>
+                    <td>
+                      <span class="badge bg-warning text-dark">Pending</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>12/01/24</td>
+                    <td><a href="#" class="text-info">View Image</a></td>
+                    <td><span class="badge bg-danger">Denied</span></td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="text-light">
+                Your next submission is due on dd/mm/yyyy.
+              </p>
+              <button
+                data-bs-toggle="modal"
+                data-bs-target="#myModal"
+                class="theme-btn btn mt-2 text-light"
+                onclick="loadCamera()"
+              >
+                Send next submission
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/cameraFunction.js') }}"></script>
+{% endblock %} {% endblock %}

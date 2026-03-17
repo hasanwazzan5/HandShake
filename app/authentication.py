@@ -6,6 +6,7 @@ import datetime
 from urllib.parse import quote
 from markupsafe import escape
 from flask import session, request, redirect, make_response
+from functools import wraps
 
 from .models import Users
 from . import db
@@ -148,3 +149,16 @@ class Authenticator:
     def invalidateUser():
         session.clear()
         return redirect(UOM_AUTH_LOGOUT_URL)
+    
+    @staticmethod
+    def getCurrentUser():
+        return Users.query.filter_by(username=session["username"]).first()
+    
+def authenticate(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        result = Authenticator.validateUser()
+        if result:
+            return result
+        return f(*args, **kwargs)
+    return decorated_function

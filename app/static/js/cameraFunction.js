@@ -2,29 +2,72 @@ snap_btn = document.getElementById("snap");
 video = document.querySelector("#video");
 canvas = document.querySelector("#canvas");
 
-// This one requests access to the camera, and displays the stream.
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) { 
-    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) { 
+modal_a = new bootstrap.Modal("#myModal");
+modal_b = new bootstrap.Modal("#otherModal");
+save_btn = document.getElementById("save");
+
+modalStream = null;
+
+again_btn = document.getElementById("tryagain");
+function loadCamera() {
+  // This one requests access to the camera, and displays the stream.
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
+      .then(function (stream) {
+        // DO THIS: Assign the actual stream here
+        modalStream = stream;
         video.srcObject = stream;
         video.play();
-    })
-}
+      })
+      .catch(function (err) {
+        console.error("Camera access blocked: ", err);
+      });
+  }
 
-snap_btn.addEventListener("click", async function() { 
+  snap_btn.addEventListener("click", async function () {
     // This will take the image itself.
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    setTimeout(() => {
+      modal_a.hide();
+      modal_b.show();
+    }, 50);
+    // Required delay, or else the picture won't be captured.
+  });
+
+  again_btn.addEventListener("click", function () {
+    modal_b.hide();
+    modal_a.show();
+  });
+
+  save.addEventListener("click", async function () {
     const imgData = canvas.toDataURL("image/png");
     const blob = await (await fetch(imgData)).blob();
     // Converts to binary, then converts to a blob, which can be sent to the server.
 
     const formData = new FormData();
-    formData.append('file', blob, "image.png")
+    formData.append("file", blob, "image.png");
 
     var dataURL = canvas.toDataURL("image/png");
-    fetch('/upload', { 
-        method: 'POST',
-        body: formData
-    })
-    
-})
+    fetch("/upload", {
+      method: "POST",
+      body: formData,
+    }).then(async (response) => {
+      if (response.ok) {
+        alert("Picture was sent successfully!");
+      } else {
+        const err = await response.text;
+        alert("Request failed: " + response.json());
+      }
+    });
+  });
+}
 
+document
+  .getElementById("myModal")
+  .addEventListener("hidden.bs.modal", function () {
+    modalStream.getTracks()[0].stop();
+    modalStream = null;
+    video.srcObject = null;
+  });
