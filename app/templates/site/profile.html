@@ -1,0 +1,49 @@
+{% extends "site/navBar.html" %} 
+{% block title %}Profile{% endblock %} 
+{% block content %}
+
+<div class="pageContainer">
+  <h2 id="title">Your Profile</h2>
+  <div class="card theme-card shadow" style="width: 30rem; padding: 30px;">
+
+    <div class="mb-4">
+      <h4 class="text-light mb-3">Profile Summary</h4>
+
+      <div class="mb-3">
+        <label class="text-alt">Name:</label>
+        <p class="text-light"><strong>Jane Doe</strong></p>
+      </div>
+
+      <div class="mb-3">
+        <label class="text-alt">Username:</label>
+        <p class="text-light"><strong>@janedoe</strong></p>
+      </div>
+
+      <div class="mb-4">
+        <label for="newUsername" class="text-alt">Change Username:</label>
+        <input 
+          type="text" 
+          class="form-control mt-2" 
+          placeholder="Enter new username"
+        />
+        <button class="btn theme-btn text-light mt-2">Update Username</button>
+      </div>
+
+      <div class="mt-4">
+        <div class="mb-2">
+          <span class="text-alt">Number of HandShakes:</span>
+          <span class="text-light"><strong> 1</strong></span>
+        </div>
+        <div>
+          <span class="text-alt">Number of Friends:</span>
+          <span class="text-light"><strong> 2</strong></span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+{% endblock %}
