@@ -8,7 +8,7 @@ block content %}
 <div class="createHabit">
   <div class="card theme-card shadow" style="width: 18rem">
     <div class="card-body p-4">
-      <form>
+      <form id="habitForm">
         <!-- Define Habit -->
         <div class="mb-4">
           <label for="habitName" class="text-light" style="font-weight: 600">
@@ -72,4 +72,8 @@ block content %}
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/submissionFuncts.js') }}"></script>
 {% endblock %}
