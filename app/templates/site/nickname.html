@@ -1,0 +1,30 @@
+{% extends "site/navBar.html" %} 
+{% block title %}Set Nickname{% endblock %} 
+{% block content %}
+
+<div class="pageContainer">
+  <h2 class="text-alt">Let's get you set up with a nickname</h2>
+  <div class="card theme-card shadow" style="width: 25rem; padding: 30px; margin-top: 20px;">
+    <div class="mb-4">
+      <p class="text-light mb-4">Choose a nickname that your accountability partners will see:</p>
+  
+      <form method="POST" action=" ">
+        <div class="mb-3">
+          <input 
+            type="text" 
+            class="form-control mt-2" 
+            id="nickname" 
+            name="nickname" 
+            placeholder="Enter your nickname"
+            required
+            maxlength="20"
+          />
+        </div>
+
+        <button type="submit" class="btn theme-btn text-light w-100 mt-3">Continue to Dashboard</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
