@@ -2,8 +2,8 @@ import secrets
 import string
 import datetime
 
-#import requests #not required in the current version (if used, add to requirments.txt)
-from urllib.parse import quote
+import requests
+from urllib.parse import quote, urlencode
 from markupsafe import escape
 from flask import session, request, redirect, make_response
 from functools import wraps
@@ -43,19 +43,12 @@ class Authenticator:
         elif request.args.get("csticket") != session.get("csticket"):
             return Authenticator.sendForAuthentication()
 
-        Authenticator.recordAuthenticatedUser()
-        return
-
-        #Fully safe version needs to include the following lines
-        #but they currently don't work
-        '''
         elif Authenticator.isGETParametersMatchingServerAuthentication():
             Authenticator.recordAuthenticatedUser()
             return
         
         else:
             return Authenticator.failAuthentication()
-        '''
 
     @staticmethod
     def isAuthenticated():
@@ -75,10 +68,18 @@ class Authenticator:
     @staticmethod
     def isGETParametersMatchingServerAuthentication():
         url = Authenticator.getAuthenticationURL("confirm")
-        url += ("&username=" + quote(escape(request.args.get("username"))) +
-                "&fullname=" + quote(escape(request.args.get("fullname"))))
+
+        confirm_url = "{}&{}".format(
+            url,
+            urlencode(
+                {
+                    "username": request.args.get("username"),
+                    "fullname": request.args.get("fullname"),
+                }
+            ),
+        )
             
-        if Authenticator.fileGetContent(url) != "true":
+        if Authenticator.fileGetContent(confirm_url) != "true":
             return False
         else:
             return True
@@ -105,7 +106,7 @@ class Authenticator:
         if not Register.isRegistered():
             Register.registerUser()
 
-    '''
+
     @staticmethod
     def fileGetContent(url):
         try:
@@ -114,7 +115,7 @@ class Authenticator:
 
         except requests.RequestException:
             return "false"
-    '''
+
         
     @staticmethod
     def generateCSTicket(length=16):
