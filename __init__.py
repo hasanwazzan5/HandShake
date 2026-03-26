@@ -1,6 +1,6 @@
 from flask import Flask
 from app.models import db
-from app.views import habits_bp
+from app.views import habits_bp, nickname_bp
 
 app = Flask(__name__)
 
@@ -9,7 +9,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///handshake.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-app.register_blueprint(habits_bp)
+app.register_blueprint(habits_bp) 
+app.register_blueprint(nickname_bp)
 
 # Create tables on first run
 with app.app_context():
