@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask import render_template, url_for, Blueprint, redirect, session, request, jsonify, send_file
 from . import db
 from sqlalchemy import or_
-from .models import UserHabits, Partnership, Users, PartnershipRequest, HabitSubmissions
+from .models import UserHabits, Partnership, Users, Friends, PartnershipRequest, HabitSubmissions
 from .authentication import Authenticator, authenticate
 from collections import defaultdict
 from io import BytesIO
@@ -188,7 +188,37 @@ def dashboard():
 @site.route('/profile')
 @authenticate
 def profile():
-    return render_template("site/profile.html")
+    current_user = Authenticator.getCurrentUser()
+    if not current_user:
+        return redirect(url_for('site.index'))
+
+    partnerships = Partnership.query.filter(
+        or_(
+            Partnership.partner_id == current_user.user_id,
+            Partnership.user_id == current_user.user_id
+        )
+    ).all()
+    handshake_count = len(partnerships)
+
+    friend_links = Friends.query.filter(
+        or_(
+            Friends.user_id == current_user.user_id,
+            Friends.friend_id == current_user.user_id
+        )
+    ).all()
+    friend_ids = set()
+    for link in friend_links:
+        if link.user_id == current_user.user_id and link.friend_id is not None:
+            friend_ids.add(link.friend_id)
+        elif link.friend_id == current_user.user_id and link.user_id is not None:
+            friend_ids.add(link.user_id)
+
+    return render_template(
+        "site/profile.html",
+        profile_name=current_user.name or "Unknown user",
+        handshake_count=handshake_count,
+        friend_count=len(friend_ids)
+    )
 
 @site.route('/login')
 @authenticate
