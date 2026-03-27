@@ -11,13 +11,18 @@ let modalStream = null;
 let capturedBlob = null;
 let selectedHabitId = null;
 let selectedHabitName = null;
+let selectedPartnerHabitId = null;
 const habitStatsDataElement = document.getElementById("habitStatsData");
 const habitSubmissionsDataElement = document.getElementById("habitSubmissionsData");
+const partnerSubmissionsDataElement = document.getElementById("partnerSubmissionsData");
 const habitStats = habitStatsDataElement
   ? JSON.parse(habitStatsDataElement.textContent || "{}")
   : {};
 const habitSubmissions = habitSubmissionsDataElement
   ? JSON.parse(habitSubmissionsDataElement.textContent || "{}")
+  : {};
+const partnerSubmissions = partnerSubmissionsDataElement
+  ? JSON.parse(partnerSubmissionsDataElement.textContent || "{}")
   : {};
 
 function formatDateForDisplay(dateObj) {
@@ -78,11 +83,104 @@ function renderStatisticsForHabit(habitId, habitName) {
         <tr>
           <td>${date}</td>
           <td><a href="${imageUrl}" class="text-info" target="_blank" rel="noopener noreferrer">View Image</a></td>
-          <td><span class="badge bg-warning text-dark">${status}</span></td>
+          <td><span class="badge ${getStatusBadgeClass(status)}">${status}</span></td>
         </tr>
       `;
     })
     .join("");
+}
+
+function getStatusBadgeClass(status) {
+  if ((status || "").toLowerCase() === "approved") {
+    return "bg-success";
+  }
+  return "bg-warning text-dark";
+}
+
+function renderPartnerSubmissionsForHabit(habitId) {
+  const submissionBodyEl = document.getElementById("partnerSubmissionBody");
+  if (!submissionBodyEl) {
+    return;
+  }
+
+  const habitKey = habitId ? String(habitId) : "";
+  const submissions = partnerSubmissions[habitKey] || [];
+
+  if (!submissions.length) {
+    submissionBodyEl.innerHTML = '<tr><td colspan="4" class="text-center text-alt">No submissions yet</td></tr>';
+    return;
+  }
+
+  submissionBodyEl.innerHTML = submissions
+    .map((entry) => {
+      const imageUrl = entry.image_url || "#";
+      const status = entry.status || "Pending review";
+      const date = entry.submission_date || "--/--/--";
+      const canApprove = status.toLowerCase() !== "approved";
+      const actionCell = canApprove
+        ? `<button type="button" class="btn btn-sm theme-btn text-light approve-submission-btn" data-submission-id="${entry.submission_id}">Approve</button>`
+        : '<span class="text-alt">Complete</span>';
+
+      return `
+        <tr>
+          <td>${date}</td>
+          <td><a href="${imageUrl}" class="text-info" target="_blank" rel="noopener noreferrer">View Image</a></td>
+          <td><span class="badge ${getStatusBadgeClass(status)}">${status}</span></td>
+          <td>${actionCell}</td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  submissionBodyEl.querySelectorAll(".approve-submission-btn").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const submissionId = button.getAttribute("data-submission-id");
+      if (!submissionId || !selectedPartnerHabitId) {
+        return;
+      }
+
+      button.disabled = true;
+      try {
+        const response = await fetch("/approve_submission", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            submission_id: Number(submissionId),
+          }),
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Unable to approve submission");
+        }
+
+        const habitKey = String(selectedPartnerHabitId);
+        const entry = (partnerSubmissions[habitKey] || []).find(
+          (item) => String(item.submission_id) === String(submissionId)
+        );
+        if (entry) {
+          entry.status = "Approved";
+        }
+
+        const partnerCard = document.querySelector(
+          `[data-partner-habit-id="${selectedPartnerHabitId}"]`
+        );
+        const streakBadge = partnerCard
+          ? partnerCard.querySelector(".partner-streak-badge")
+          : null;
+        if (streakBadge && Number.isInteger(result.updated_streak)) {
+          streakBadge.textContent = `${result.updated_streak} Day Streak`;
+        }
+
+        renderPartnerSubmissionsForHabit(selectedPartnerHabitId);
+      } catch (error) {
+        alert(error.message || "Unable to approve submission right now.");
+        button.disabled = false;
+      }
+    });
+  });
 }
 
 function canvasToBlob(canvasElement) {
@@ -197,6 +295,27 @@ if (statsModal && sendSubmissionBtn) {
     selectedHabitId = triggerBtn ? triggerBtn.getAttribute("data-habit-id") : null;
     selectedHabitName = triggerBtn ? triggerBtn.getAttribute("data-habit-name") : null;
     renderStatisticsForHabit(selectedHabitId, selectedHabitName);
+  });
+}
+
+const partnerSubmissionsModal = document.getElementById("partnerSubmissionsModal");
+if (partnerSubmissionsModal) {
+  partnerSubmissionsModal.addEventListener("show.bs.modal", (event) => {
+    const triggerBtn = event.relatedTarget;
+    selectedPartnerHabitId = triggerBtn
+      ? triggerBtn.getAttribute("data-partner-habit-id")
+      : null;
+
+    const partnerNameEl = document.getElementById("partnerReviewPartnerName");
+    const habitNameEl = document.getElementById("partnerReviewHabitName");
+    if (partnerNameEl && triggerBtn) {
+      partnerNameEl.textContent = triggerBtn.getAttribute("data-partner-name") || "Partner";
+    }
+    if (habitNameEl && triggerBtn) {
+      habitNameEl.textContent = triggerBtn.getAttribute("data-habit-name") || "Habit";
+    }
+
+    renderPartnerSubmissionsForHabit(selectedPartnerHabitId);
   });
 }
 

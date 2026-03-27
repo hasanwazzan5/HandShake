@@ -21,6 +21,15 @@ def ensure_submission_blob_columns():
     if "mime_type" not in column_names:
         db.session.execute(text("ALTER TABLE habit_submissions ADD COLUMN mime_type TEXT DEFAULT 'image/png'"))
 
+    if "status" not in column_names:
+        db.session.execute(text("ALTER TABLE habit_submissions ADD COLUMN status TEXT DEFAULT 'pending'"))
+
+    if "reviewed_by_user_id" not in column_names:
+        db.session.execute(text("ALTER TABLE habit_submissions ADD COLUMN reviewed_by_user_id INTEGER"))
+
+    if "reviewed_at" not in column_names:
+        db.session.execute(text("ALTER TABLE habit_submissions ADD COLUMN reviewed_at DATETIME"))
+
     db.session.commit()
 
 def createApp():

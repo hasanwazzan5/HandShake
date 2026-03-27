@@ -79,12 +79,23 @@
     <div class="habit-cards">
       {% if partner_habits %}
         {% for partner_habit in partner_habits %}
-          <div class="card theme-card shadow" style="width: 18rem">
+          <div class="card theme-card shadow" style="width: 18rem" data-partner-habit-id="{{ partner_habit.partner_habit_id }}">
             <div class="card-body">
               <h5 class="card-title text-light">{{ partner_habit.habit_name }}</h5>
               <p class="text-alt mb-1">Partner: {{ partner_habit.partner_name }}</p>
               <p class="text-alt mb-1">Frequency: {{ partner_habit.frequency }}</p>
-              <span class="badge bg-info">{{ partner_habit.streak }} Day Streak</span>
+              <span class="badge bg-info partner-streak-badge">{{ partner_habit.streak }} Day Streak</span>
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#partnerSubmissionsModal"
+                data-partner-habit-id="{{ partner_habit.partner_habit_id }}"
+                data-partner-name="{{ partner_habit.partner_name }}"
+                data-habit-name="{{ partner_habit.habit_name }}"
+                class="theme-btn btn mt-3 text-light"
+              >
+                Review Submissions
+              </button>
             </div>
           </div>
         {% endfor %}
@@ -96,6 +107,50 @@
           </div>
         </div>
       {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="partnerSubmissionsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-light">
+        <h5 class="modal-title text-light">
+          <span id="partnerReviewPartnerName">Partner</span>'s Submissions: <span id="partnerReviewHabitName">Habit</span>
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-dark table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Submission date (dd/mm/yy)</th>
+              <th>Image</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="partnerSubmissionBody">
+            <tr>
+              <td colspan="4" class="text-center text-alt">No submissions yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -243,5 +298,6 @@
 {% block scripts %}
 <script id="habitStatsData" type="application/json">{{ habit_stats | tojson }}</script>
 <script id="habitSubmissionsData" type="application/json">{{ habit_submissions | tojson }}</script>
+<script id="partnerSubmissionsData" type="application/json">{{ partner_submissions | tojson }}</script>
 <script src="{{ url_for('static', filename='js/cameraFunction.js') }}"></script>
 {% endblock %}

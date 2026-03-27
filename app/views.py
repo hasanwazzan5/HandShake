@@ -1,4 +1,5 @@
 # Flask views, for later
+from datetime import datetime
 from flask import render_template, url_for, Blueprint, redirect, session, request, jsonify, send_file
 from . import db
 from sqlalchemy import or_
@@ -9,6 +10,29 @@ from io import BytesIO
 from .partnership import Partner
 
 site = Blueprint('site', __name__)
+
+
+def _status_label(status):
+    if not status:
+        return "Pending review"
+    status_map = {
+        "pending": "Pending review",
+        "approved": "Approved",
+    }
+    return status_map.get(status.lower(), status.capitalize())
+
+
+def _is_partner_reviewer(owner_user_id, reviewer_user_id, owner_habit_id):
+    low_id = min(owner_user_id, reviewer_user_id)
+    high_id = max(owner_user_id, reviewer_user_id)
+
+    partnership = Partnership.query.filter_by(partner_id=low_id, user_id=high_id).first()
+    if not partnership:
+        return False
+
+    if owner_user_id == partnership.partner_id:
+        return partnership.partner_userhabit_id == owner_habit_id
+    return partnership.user_userhabit_id == owner_habit_id
 
 @site.route('/')
 def index():
@@ -31,6 +55,7 @@ def dashboard():
 
     partner_name_by_habit_id = {}
     partner_habits = []
+    partner_habit_ids = []
     for partnership in partnerships:
         if partnership.partner_id == current_user.user_id:
             own_habit_id = partnership.partner_userhabit_id
@@ -47,11 +72,13 @@ def dashboard():
 
         partner_habit = UserHabits.query.filter_by(userhabit_id=partner_habit_id).first()
         if partner_user and partner_habit:
+            partner_habit_ids.append(partner_habit.userhabit_id)
             partner_habits.append({
                 "partner_name": partner_user.name or "Partner",
                 "habit_name": partner_habit.habit_name or "Habit placeholder",
                 "frequency": partner_habit.frequency.capitalize() if partner_habit.frequency else "Unknown",
-                "streak": partner_habit.streak if partner_habit.streak is not None else 0
+                "streak": partner_habit.streak if partner_habit.streak is not None else 0,
+                "partner_habit_id": partner_habit.userhabit_id
             })
 
     habits = []
@@ -78,7 +105,22 @@ def dashboard():
             submissions_grouped[submission.userhabit_id].append({
                 "submission_date": submission.submission_date.strftime("%d/%m/%y"),
                 "image_url": url_for('site.submission_image', submission_id=submission.submission_id),
-                "status": "Pending review"
+                "status": _status_label(submission.status)
+            })
+
+    partner_submissions_grouped = defaultdict(list)
+    if partner_habit_ids:
+        partner_submissions = HabitSubmissions.query.filter(
+            HabitSubmissions.userhabit_id.in_(partner_habit_ids),
+            HabitSubmissions.image_blob.isnot(None)
+        ).order_by(HabitSubmissions.submission_date.desc()).all()
+
+        for submission in partner_submissions:
+            partner_submissions_grouped[submission.userhabit_id].append({
+                "submission_id": submission.submission_id,
+                "submission_date": submission.submission_date.strftime("%d/%m/%y"),
+                "image_url": url_for('site.submission_image', submission_id=submission.submission_id),
+                "status": _status_label(submission.status)
             })
 
     habit_stats = {}
@@ -118,7 +160,8 @@ def dashboard():
         partner_habits=partner_habits,
         pending_cards=pending_cards,
         habit_stats=habit_stats,
-        habit_submissions=habit_submissions
+        habit_submissions=habit_submissions,
+        partner_submissions=partner_submissions_grouped
     )
 
 @site.route('/login')
@@ -316,7 +359,15 @@ def submission_image(submission_id):
         return "Image not found", 404
 
     habit = UserHabits.query.filter_by(userhabit_id=submission.userhabit_id).first()
-    if not habit or habit.user_id != current_user.user_id:
+    if not habit:
+        return "Image not found", 404
+
+    can_view = habit.user_id == current_user.user_id or _is_partner_reviewer(
+        owner_user_id=habit.user_id,
+        reviewer_user_id=current_user.user_id,
+        owner_habit_id=habit.userhabit_id
+    )
+    if not can_view:
         return "Forbidden", 403
 
     return send_file(
@@ -325,3 +376,61 @@ def submission_image(submission_id):
         as_attachment=False,
         download_name=f"submission_{submission.submission_id}.png"
     )
+
+
+@site.route('/approve_submission', methods=["POST"])
+@authenticate
+def approve_submission():
+    if not request.is_json:
+        return jsonify({"success": False, "error": "JSON body required"}), 400
+
+    submission_id = request.json.get("submission_id")
+    if submission_id is None:
+        return jsonify({"success": False, "error": "submission_id is required"}), 400
+
+    try:
+        submission_id = int(submission_id)
+    except (TypeError, ValueError):
+        return jsonify({"success": False, "error": "submission_id must be an integer"}), 400
+
+    current_user = Authenticator.getCurrentUser()
+    submission = HabitSubmissions.query.filter_by(submission_id=submission_id).first()
+    if not submission:
+        return jsonify({"success": False, "error": "Submission not found"}), 404
+
+    habit = UserHabits.query.filter_by(userhabit_id=submission.userhabit_id).first()
+    if not habit:
+        return jsonify({"success": False, "error": "Habit not found"}), 404
+
+    if habit.user_id == current_user.user_id:
+        return jsonify({"success": False, "error": "You cannot approve your own submission"}), 403
+
+    if not _is_partner_reviewer(
+        owner_user_id=habit.user_id,
+        reviewer_user_id=current_user.user_id,
+        owner_habit_id=habit.userhabit_id
+    ):
+        return jsonify({"success": False, "error": "Not allowed to approve this submission"}), 403
+
+    current_status = (submission.status or "pending").lower()
+    if current_status == "approved":
+        return jsonify({
+            "success": True,
+            "message": "Submission already approved",
+            "status": "Approved",
+            "updated_streak": habit.streak if habit.streak is not None else 0
+        }), 200
+
+    submission.status = "approved"
+    submission.reviewed_by_user_id = current_user.user_id
+    submission.reviewed_at = datetime.utcnow()
+    habit.streak = (habit.streak or 0) + 1
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True,
+        "message": "Submission approved",
+        "status": "Approved",
+        "updated_streak": habit.streak
+    }), 200
