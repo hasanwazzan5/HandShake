@@ -1,5 +1,5 @@
 # Flask views, for later
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import render_template, url_for, Blueprint, redirect, session, request, jsonify, send_file
 from . import db
 from sqlalchemy import or_
@@ -34,6 +34,18 @@ def _is_partner_reviewer(owner_user_id, reviewer_user_id, owner_habit_id):
         return partnership.partner_userhabit_id == owner_habit_id
     return partnership.user_userhabit_id == owner_habit_id
 
+
+def _next_due_date_for_habit(habit, latest_submission):
+    frequency = (habit.frequency or "").strip().lower()
+    cadence_days = 7 if frequency == "weekly" else 1
+
+    if latest_submission and latest_submission.submission_date:
+        base_date = latest_submission.submission_date.date()
+    else:
+        base_date = datetime.utcnow().date()
+
+    return (base_date + timedelta(days=cadence_days)).strftime("%d/%m/%y")
+
 @site.route('/')
 def index():
     return render_template("index.html")
@@ -54,6 +66,7 @@ def dashboard():
     ).all()
 
     partner_name_by_habit_id = {}
+    paired_own_habit_ids = set()
     partner_habits = []
     partner_habit_ids = []
     for partnership in partnerships:
@@ -65,6 +78,9 @@ def dashboard():
             own_habit_id = partnership.user_userhabit_id
             partner_user_id = partnership.partner_id
             partner_habit_id = partnership.partner_userhabit_id
+
+        if own_habit_id:
+            paired_own_habit_ids.add(own_habit_id)
 
         partner_user = Users.query.filter_by(user_id=partner_user_id).first()
         if partner_user and own_habit_id:
@@ -128,6 +144,11 @@ def dashboard():
     for habit in user_habits:
         submissions_for_habit = submissions_grouped.get(habit.userhabit_id, [])
         progress_number = habit.progress_number if habit.progress_number is not None else 0
+        latest_submission = HabitSubmissions.query.filter_by(
+            userhabit_id=habit.userhabit_id
+        ).filter(
+            HabitSubmissions.image_blob.isnot(None)
+        ).order_by(HabitSubmissions.submission_date.desc()).first()
 
         habit_submissions[str(habit.userhabit_id)] = submissions_for_habit
         habit_stats[str(habit.userhabit_id)] = {
@@ -136,7 +157,7 @@ def dashboard():
             "longest_streak": habit.streak if habit.streak is not None else 0,
             "total_completions": len(submissions_for_habit),
             "completion_rate": f"{max(0, min(progress_number, 100))}%",
-            "next_submission_due": "Placeholder due date"
+            "next_submission_due": _next_due_date_for_habit(habit, latest_submission)
         }
 
     pending_requests = PartnershipRequest.query.filter_by(
@@ -147,7 +168,7 @@ def dashboard():
     pending_by_habit_id = {req.user_userhabit_id: req for req in pending_requests}
     pending_cards = []
     for habit in user_habits:
-        if habit.userhabit_id in pending_by_habit_id:
+        if habit.userhabit_id in pending_by_habit_id and habit.userhabit_id not in paired_own_habit_ids:
             pending_cards.append({
                 "habit_name": habit.habit_name,
                 "status": "Pending"
@@ -338,6 +359,7 @@ def upload_test():
                 mime_type=mime_type
             )
             db.session.add(submission)
+            habit.completion_date = datetime.utcnow().isoformat()
             db.session.commit()
         except Exception as e:
             db.session.rollback()

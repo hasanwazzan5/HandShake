@@ -50,6 +50,18 @@ class Partner:
             )
             db.session.add(newPartnership)
             req.status = "accepted"
+
+            related_pending_requests = PartnershipRequest.query.filter(
+                PartnershipRequest.status == "pending",
+                PartnershipRequest.partnership_request_id != req.partnership_request_id,
+                PartnershipRequest.user_userhabit_id.in_([
+                    req.user_userhabit_id,
+                    newUserHabitId
+                ])
+            ).all()
+            for pending_req in related_pending_requests:
+                pending_req.status = "paired"
+
             db.session.commit()
         else:
             return False

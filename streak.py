@@ -1,34 +1,73 @@
-from app import db,createApp
-from app.models import Users, UserHabits
+from datetime import datetime, timedelta
+import time
+
 import schedule
 from schedule import every, repeat
-from datetime import time, timedelta, datetime
-from flask import session
-import time
+
+from app import createApp, db
+from app.models import HabitSubmissions, UserHabits
+
+
 app = createApp()
 
 
-@app.route('/completedhabit') #should run whenever habit completes
-def increment_streak():#when habit complete, streak increases
-    habits = db.session.query(UserHabits).filter_by(completed = True).all()
+def _cadence_days(habit):
+    frequency = (habit.frequency or "").strip().lower()
+    return 7 if frequency == "weekly" else 1
+
+
+def _parse_completion_date(completion_date_value):
+    if not completion_date_value:
+        return None
+    try:
+        return datetime.fromisoformat(completion_date_value).date()
+    except ValueError:
+        return None
+
+
+def _latest_upload_date(habit_id):
+    latest_submission = HabitSubmissions.query.filter_by(userhabit_id=habit_id).filter(
+        HabitSubmissions.image_blob.isnot(None)
+    ).order_by(HabitSubmissions.submission_date.desc()).first()
+
+    if latest_submission and latest_submission.submission_date:
+        return latest_submission.submission_date.date()
+    return None
+
+
+@repeat(every(1).day.at("01:00"))
+def reset_missed_streaks():
+    today = datetime.utcnow().date()
+    habits = UserHabits.query.all()
+    did_change = False
+
     for habit in habits:
-        habit.streak = habit.streak + 1
-    db.session.commit()
+        cadence_days = _cadence_days(habit)
+        last_upload_date = _latest_upload_date(habit.userhabit_id)
+        last_completed_date = _parse_completion_date(habit.completion_date)
+        last_activity_date = last_upload_date or last_completed_date
+
+        if not last_activity_date:
+            if (habit.streak or 0) > 0:
+                habit.streak = 0
+                habit.completed = False
+                did_change = True
+            continue
+
+        due_date = last_activity_date + timedelta(days=cadence_days)
+        if today > due_date and (habit.streak or 0) > 0:
+            habit.streak = 0
+            habit.completed = False
+            did_change = True
+
+    if did_change:
+        db.session.commit()
 
 
-@repeat(every(1).day.at("01:00")) #every day at 1 am function runs
-def refresh_daily_habits():
-    habits = db.session.query(UserHabits).filter_by(completed = False).all()#queries all habits where completed is False
-    for habit in habits:
-        habit.streak = 0
-    db.session.commit()
-
-with app.app_context():
-    # refresh_daily_habits()
-    # increment_streak()
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+if __name__ == "__main__":
+    with app.app_context():
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
 
 
