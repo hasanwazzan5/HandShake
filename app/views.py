@@ -164,6 +164,11 @@ def dashboard():
         partner_submissions=partner_submissions_grouped
     )
 
+@site.route('/profile')
+@authenticate
+def profile():
+    return render_template("site/profile.html")
+
 @site.route('/login')
 @authenticate
 def login():
