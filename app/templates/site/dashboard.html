@@ -1,256 +1,303 @@
-{% extends "site/navBar.html" %} 
-{% block title %}Dashboard{% endblock %} 
+{% extends "site/navBar.html" %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
 
 <div class="dashboardPage">
   <div class="text-center mb-4">
-    <h2 id="title">Welcome!</h2>
+    <h2 id="title">Welcome{% if firstname %}, {{ firstname }}{% endif %}!</h2>
   </div>
 
-  <!-- Active Habits Section -->
   <div class="dashboard-section">
     <h3 class="theme-txt">Your Active Habits</h3>
     
     <div class="habit-cards">
-      <!-- Habit Card 1 -->
-      <div class="card theme-card shadow" style="width: 18rem">
-        <div class="card-body">
-          <h5 class="card-title text-light">Morning Gym</h5>
-          <p class="text-alt">Partner: Hasan</p>
-          <div class="habit-progress">
-            <div class="streak-info mb-2">
-              <span class="badge bg-success">7 Day Streak</span>
-            </div>
-            <div class="progress" style="height: 12px;">
-              <div class="progress-bar bg-success" style="width: 87%"></div>
+      {% if habits %}
+        {% for habit in habits %}
+          <div class="card theme-card shadow" style="width: 18rem">
+            <div class="card-body">
+              <h5 class="card-title text-light">{{ habit.habit_name }}</h5>
+              <p class="text-alt">Partner: {{ habit.partner_name }}</p>
+              <div class="habit-progress">
+                <div class="streak-info mb-2">
+                  <span class="badge bg-success">{{ habit.streak }} Day Streak</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#statsModal"
+                data-habit-id="{{ habit.habit_id }}"
+                data-habit-name="{{ habit.habit_name }}"
+                class="theme-btn btn mt-2 text-light"
+              >
+                View Details
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#statsModal"
-            class="theme-btn btn mt-2 text-light"
-          >
-            View Details
-          </button>
+        {% endfor %}
+      {% else %}
+        <div class="card theme-card shadow" style="width: 22rem">
+          <div class="card-body">
+            <h5 class="card-title text-light">No habits yet</h5>
+            <p class="text-alt mb-0">Create your first habit to start tracking your streak.</p>
+          </div>
         </div>
-      </div>
+      {% endif %}
+    </div>
 
-      <!-- Habit Card 2 -->
-      <div class="card theme-card shadow" style="width: 18rem">
-        <div class="card-body">
-          <h5 class="card-title text-light">Daily Coding</h5>
-          <p class="text-alt">Partner: Daniel</p>
-          <div class="habit-progress">
-            <div class="streak-info mb-2">
-              <span class="badge bg-success">15 Day Streak</span>
-            </div>
-            <div class="progress" style="height: 12px;">
-              <div class="progress-bar bg-success" style="width: 90%"></div>
-            </div>
-          </div>
-          <button
-            type="button"
-            data-bs-toggle="modal"
-            data-bs-target="#myModal"
-            class="theme-btn btn mt-2 text-light"
-          >
-            Register your streak
-          </button>
-        </div>
-      </div>
+    <div>
+      <a href="{{ url_for('site.show_habit') }}" class="btn btn-md theme-btn text-light mt-5">+ Create New Habit</a>
+    </div>
+  </div>
 
-      <!-- Habit Card 3 -->
-      <div class="card theme-card shadow" style="width: 18rem">
-        <div class="card-body">
-          <h5 class="card-title text-light">Reading</h5>
-          <p class="text-alt">Partner: Yuka</p>
-          <div class="habit-progress">
-            <div class="streak-info mb-2">
-              <span class="badge bg-success">6 Day Streak</span>
-            </div>
-            <div class="progress" style="height: 12px;">
-              <div class="progress-bar bg-success" style="width: 67%"></div>
+  <div class="dashboard-section">
+    <h3 class="theme-txt">Pending Pairing Requests</h3>
+    <div class="habit-cards">
+      {% if pending_cards %}
+        {% for card in pending_cards %}
+          <div class="card theme-card shadow" style="width: 18rem">
+            <div class="card-body">
+              <h5 class="card-title text-light">{{ card.habit_name }}</h5>
+              <p class="text-alt mb-2">Partner search status</p>
+              <span class="badge bg-warning text-dark">{{ card.status }}</span>
             </div>
           </div>
+        {% endfor %}
+      {% else %}
+        <div class="card theme-card shadow" style="width: 22rem">
+          <div class="card-body">
+            <h5 class="card-title text-light">No pending requests</h5>
+            <p class="text-alt mb-0">Any new requests will appear here.</p>
+          </div>
         </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="dashboard-section">
+    <h3 class="theme-txt">Partner Habits</h3>
+    <div class="habit-cards">
+      {% if partner_habits %}
+        {% for partner_habit in partner_habits %}
+          <div class="card theme-card shadow" style="width: 18rem" data-partner-habit-id="{{ partner_habit.partner_habit_id }}">
+            <div class="card-body">
+              <h5 class="card-title text-light">{{ partner_habit.habit_name }}</h5>
+              <p class="text-alt mb-1">Partner: {{ partner_habit.partner_name }}</p>
+              <p class="text-alt mb-1">Frequency: {{ partner_habit.frequency }}</p>
+              <span class="badge bg-info partner-streak-badge">{{ partner_habit.streak }} Day Streak</span>
+              <button
+                type="button"
+                data-bs-toggle="modal"
+                data-bs-target="#partnerSubmissionsModal"
+                data-partner-habit-id="{{ partner_habit.partner_habit_id }}"
+                data-partner-name="{{ partner_habit.partner_name }}"
+                data-habit-name="{{ partner_habit.habit_name }}"
+                class="theme-btn btn mt-3 text-light"
+              >
+                Review Submissions
+              </button>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="card theme-card shadow" style="width: 22rem">
+          <div class="card-body">
+            <h5 class="card-title text-light">No partner habits yet</h5>
+            <p class="text-alt mb-0">Accept a pairing request to see your partners' habits here.</p>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="partnerSubmissionsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-light">
+        <h5 class="modal-title text-light">
+          <span id="partnerReviewPartnerName">Partner</span>'s Submissions: <span id="partnerReviewHabitName">Habit</span>
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-dark table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>Submission date (dd/mm/yy)</th>
+              <th>Image</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="partnerSubmissionBody">
+            <tr>
+              <td colspan="4" class="text-center text-alt">No submissions yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
       </div>
     </div>
-  <div>
-    <a href="#" class="btn btn-lg theme-btn text-light mt-5">+ Create New Habit</a>  
   </div>
+</div>
+
+<div class="modal" id="myModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-dark">
+        <h5 class="modal-title text-light">Snap a picture of your task!</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body bg-dark">
+        <video id="video" width="50%" height="auto" autoplay></video>
+      </div>
+      <div class="modal-footer border-dark bg-dark">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+        <button type="button" id="snap" class="btn btn-primary">
+          Snap a picture!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="otherModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-dark">
+        <h5 class="modal-title text-light">Happy?</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body bg-dark">
+        <canvas id="canvas" width="550" height="410"></canvas>
+      </div>
+      <div class="modal-footer border-dark bg-dark">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+          id="tryagain"
+          onclick="loadCamera()"
+        >
+          Try again...
+        </button>
+        <button type="button" id="save" class="btn btn-primary">
+          Save!
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="statsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark">
+      <div class="modal-header border-light">
+        <h5 class="modal-title text-light">Statistics: <span id="statsHabitName">Habit</span></h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="streak-statistics">
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <h6 class="text-light mb-2">Current Streak</h6>
+              <p id="currentStreakValue" class="text-warning fs-4 fw-bold">--</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-light mb-2">Longest Streak</h6>
+              <p id="longestStreakValue" class="text-info fs-4 fw-bold">--</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-light mb-2">Total Completions</h6>
+              <p id="totalCompletionsValue" class="text-success fs-4 fw-bold">--</p>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-light mb-2">Completion Rate</h6>
+              <p id="completionRateValue" class="text-danger fs-4 fw-bold">--</p>
+            </div>
+          </div>
+
+          <table class="table table-dark table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>Submission date (dd/mm/yy)</th>
+                <th>Image</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="statsSubmissionBody">
+              <tr>
+                <td colspan="3" class="text-center text-alt">No submission data yet</td>
+              </tr>
+            </tbody>
+          </table>
+          <p id="nextSubmissionDue" class="text-light">
+            Your next submission due date will appear here.
+          </p>
+          <button
+            data-bs-toggle="modal"
+            data-bs-target="#myModal"
+            id="sendSubmissionBtn"
+            class="theme-btn btn mt-2 text-light"
+            onclick="loadCamera()"
+          >
+            Send next submission
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 {% endblock %}
-    <div>
-      <a
-        href="{{url_for('site.show_habit')}}"
-        class="btn btn-md theme-btn text-light mt-5"
-        >+ Create New Habit</a
-      >
-      <!-- #: /createHabit.html -->
-    </div>
 
-    <div class="modal" id="myModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content bg-dark">
-          <div class="modal-header border-dark">
-            <h5 class="modal-title text-light">Snap a picture of your task!</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body bg-dark">
-            <video id="video" width="50%" height="auto" autoplay></video>
-          </div>
-          <div class="modal-footer border-dark bg-dark">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-            <button type="button" id="snap" class="btn btn-primary">
-              Snap a picture!
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for displaying the captured image -->
-    <div class="modal" id="otherModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content bg-dark">
-          <div class="modal-header border-dark">
-            <h5 class="modal-title text-light">Happy?</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body bg-dark">
-            <canvas id="canvas" width="550" height="410"></canvas>
-          </div>
-          <div class="modal-footer border-dark bg-dark">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-              id="tryagain"
-              onclick="loadCamera()"
-            >
-              Try again...
-            </button>
-            <button type="button" id="save" class="btn btn-primary">
-              Save!
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for displaying the statistics -->
-    <div class="modal" id="statsModal" tabindex="-1">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark">
-          <div class="modal-header border-light">
-            <h5 class="modal-title text-light">Statistics</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <div class="streak-statistics">
-              <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                  <h6 class="text-light mb-2">Current Streak</h6>
-                  <p class="text-warning fs-4 fw-bold">12 Days</p>
-                </div>
-                <div class="col-md-6">
-                  <h6 class="text-light mb-2">Longest Streak</h6>
-                  <p class="text-info fs-4 fw-bold">15 Days</p>
-                </div>
-                <div class="col-md-6">
-                  <h6 class="text-light mb-2">Total Completions</h6>
-                  <p class="text-success fs-4 fw-bold">42</p>
-                </div>
-                <div class="col-md-6">
-                  <h6 class="text-light mb-2">Completion Rate</h6>
-                  <p class="text-danger fs-4 fw-bold">85%</p>
-                </div>
-              </div>
-
-              <table class="table table-dark table-bordered table-striped">
-                <thead>
-                  <tr>
-                    <th>Submission date (dd/mm/yy)</th>
-                    <th>Image</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>15/01/24</td>
-                    <td><a href="#" class="text-info">View Image</a></td>
-                    <td><span class="badge bg-success">Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td>14/01/24</td>
-                    <td><a href="#" class="text-info">View Image</a></td>
-                    <td><span class="badge bg-success">Approved</span></td>
-                  </tr>
-                  <tr>
-                    <td>13/01/24</td>
-                    <td><a href="#" class="text-info">View Image</a></td>
-                    <td>
-                      <span class="badge bg-warning text-dark">Pending</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>12/01/24</td>
-                    <td><a href="#" class="text-info">View Image</a></td>
-                    <td><span class="badge bg-danger">Denied</span></td>
-                  </tr>
-                </tbody>
-              </table>
-              <p class="text-light">
-                Your next submission is due on dd/mm/yyyy.
-              </p>
-              <button
-                data-bs-toggle="modal"
-                data-bs-target="#myModal"
-                class="theme-btn btn mt-2 text-light"
-                onclick="loadCamera()"
-              >
-                Send next submission
-              </button>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-bs-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 {% block scripts %}
+<script id="habitStatsData" type="application/json">{{ habit_stats | tojson }}</script>
+<script id="habitSubmissionsData" type="application/json">{{ habit_submissions | tojson }}</script>
+<script id="partnerSubmissionsData" type="application/json">{{ partner_submissions | tojson }}</script>
 <script src="{{ url_for('static', filename='js/cameraFunction.js') }}"></script>
 {% endblock %}

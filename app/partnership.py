@@ -3,6 +3,7 @@ from . import db
 from .models import Partnership, PartnershipRequest
 from .authentication import Authenticator
 
+
 class Partner:
     @staticmethod
     def pairRequest(userHabitId):
@@ -12,7 +13,7 @@ class Partner:
             sender_id=currentUser.user_id,
             user_userhabit_id=userHabitId,
         ).first()
-        
+
         if existing:
             return False
 
@@ -21,7 +22,7 @@ class Partner:
             user_userhabit_id=userHabitId,
             status="pending"
         )
-        
+
         db.session.add(req)
         db.session.commit()
 
@@ -32,11 +33,9 @@ class Partner:
         currentUser = Authenticator.getCurrentUser()
 
         req = PartnershipRequest.query.filter_by(partnership_request_id=requestId).first()
-
-        if req.status != "pending":
+        if not req or req.status != "pending":
             return False
-       
-       #creating partnership
+
         partnerId = req.sender_id
 
         low = min((partnerId, req.user_userhabit_id), (currentUser.user_id, newUserHabitId))
@@ -50,11 +49,11 @@ class Partner:
                 user_userhabit_id=high[1]
             )
             db.session.add(newPartnership)
-            req.status = "accepted" 
+            req.status = "accepted"
             db.session.commit()
         else:
             return False
-        
+
         return True
 
     @staticmethod
@@ -83,7 +82,7 @@ class Partner:
     @staticmethod
     def arePartnered(low_id, high_id):
         partnership = Partnership.query.filter_by(partner_id=low_id, user_id=high_id).first()
-        
+
         if partnership:
             return True
         else:

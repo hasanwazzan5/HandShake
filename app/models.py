@@ -1,5 +1,6 @@
 # Write SQLAlchemy class models here
 from . import db
+from datetime import datetime
 
 class Users(db.Model):
     __tablename__ = "users"
@@ -55,3 +56,17 @@ class UserHabits(db.Model):
             "frequency":  self.frequency,
             "goal":       self.goal
         }
+
+
+class HabitSubmissions(db.Model):
+    __tablename__ = "habit_submissions"
+
+    submission_id = db.Column(db.Integer, primary_key=True)
+    userhabit_id = db.Column(db.Integer, db.ForeignKey('user_habits.userhabit_id'), nullable=False)
+    image_path = db.Column(db.String(255), nullable=False, default="")
+    image_blob = db.Column(db.LargeBinary)
+    mime_type = db.Column(db.String(100), default="image/png")
+    status = db.Column(db.String(20), nullable=False, default="pending")
+    reviewed_by_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    reviewed_at = db.Column(db.DateTime)
+    submission_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

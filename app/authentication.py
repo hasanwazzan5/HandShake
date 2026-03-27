@@ -150,11 +150,15 @@ class Authenticator:
     def invalidateUser():
         session.clear()
         return redirect(UOM_AUTH_LOGOUT_URL)
-    
+
     @staticmethod
     def getCurrentUser():
-        return Users.query.filter_by(username=session["username"]).first()
-    
+        username = session.get("username")
+        if not username:
+            return None
+        return Users.query.filter_by(username=username).first()
+
+
 def authenticate(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -162,4 +166,5 @@ def authenticate(f):
         if result:
             return result
         return f(*args, **kwargs)
+
     return decorated_function

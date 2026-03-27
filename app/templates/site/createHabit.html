@@ -8,7 +8,7 @@ block content %}
 <div class="createHabit">
   <div class="card theme-card shadow" style="width: 18rem">
     <div class="card-body p-4">
-      <form>
+      <form id="habitForm">
         <!-- Define Habit -->
         <div class="mb-4">
           <label for="habitName" class="text-light" style="font-weight: 600">
@@ -36,6 +36,17 @@ block content %}
           />
         </div>
         <br />
+
+        <div class="mb-4">
+          <label for="goal" class="text-light" style="font-weight: 600"> Goal </label>
+          <input
+            type="text"
+            class="form-control"
+            id="habitGoal"
+            placeholder="e.g. Lose weight, learn to cook, etc..."
+            required
+            />
+        </div>
 
         <!-- Frequency -->
         <div class="mb-4">
@@ -66,6 +77,7 @@ block content %}
         </div>
         <br />
 
+
         <!-- Submit Buttons -->
         <div class="d-flex gap-3 mt-4">
           <button type="submit" class="btn theme-btn text-light">
@@ -77,4 +89,8 @@ block content %}
   </div>
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/submissionFuncts.js') }}"></script>
 {% endblock %}
